@@ -1,0 +1,2649 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>أسطورة عيد ميلاد وفاء منصوري | Wafae Manssouri • 8-Realm 3D Universe</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@400;600;700;800&family=Cinzel+Decorative:wght@700;900&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Three.js Core -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        arabic: ['Cairo', 'sans-serif'],
+                        amiri: ['Amiri', 'serif'],
+                        royal: ['Cinzel Decorative', 'serif'],
+                        playfair: ['Playfair Display', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        :root {
+            --accent-primary: #34d399;
+            --accent-secondary: #a855f7;
+            --accent-glow: rgba(52, 211, 153, 0.45);
+            --bg-deep: #03030c;
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-left: env(safe-area-inset-left, 0px);
+            --safe-right: env(safe-area-inset-right, 0px);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            background-color: var(--bg-deep);
+            color: #fff8eb;
+            font-family: 'Cairo', sans-serif;
+            transition: background-color 0.8s ease;
+        }
+
+        /* Full-viewport 3D WebGL & 2D Stardust Overlay Canvases */
+        #webgl-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100dvh;
+            z-index: 0;
+            display: block;
+            touch-action: none;
+        }
+
+        #stardust-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100dvh;
+            z-index: 2;
+            pointer-events: none;
+            display: block;
+        }
+
+        /* Main UI Layout Container with Safe-Area Insets */
+        .ui-shell {
+            position: relative;
+            z-index: 10;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-top: calc(0.65rem + var(--safe-top));
+            padding-bottom: calc(0.65rem + var(--safe-bottom));
+            padding-left: calc(0.75rem + var(--safe-left));
+            padding-right: calc(0.75rem + var(--safe-right));
+            pointer-events: none;
+        }
+
+        /* Glassmorphism & 3D Tilt Specular Cards */
+        .glass-panel {
+            background: linear-gradient(145deg, rgba(14, 12, 32, 0.72) 0%, rgba(5, 5, 16, 0.88) 100%);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .tilt-card {
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        .tilt-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), var(--accent-glow), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            pointer-events: none;
+        }
+
+        .tilt-card:hover::before {
+            opacity: 1;
+        }
+
+        .tilt-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 22px 50px rgba(0, 0, 0, 0.75), 0 0 28px var(--accent-glow);
+        }
+
+        /* Fluid Typography with clamp() */
+        .hero-arabic-title {
+            font-size: clamp(1.75rem, 5.2vw, 4.1rem);
+            line-height: 1.15;
+            background: linear-gradient(120deg, #ffffff 0%, var(--accent-primary) 38%, var(--accent-secondary) 72%, #fff3c4 100%);
+            background-size: 220% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmerFlow 5s linear infinite;
+            filter: drop-shadow(0 6px 24px rgba(0, 0, 0, 0.85));
+        }
+
+        .hero-subtitle {
+            font-size: clamp(0.9rem, 2.2vw, 1.5rem);
+            color: rgba(255, 248, 235, 0.9);
+            text-shadow: 0 2px 16px rgba(0, 0, 0, 0.9);
+        }
+
+        @keyframes shimmerFlow {
+            to { background-position: 220% center; }
+        }
+
+        /* Magnetic Buttons */
+        .magnetic-btn {
+            pointer-events: auto;
+            transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, background 0.3s ease;
+            will-change: transform;
+        }
+
+        .magnetic-btn:active {
+            transform: scale(0.95) !important;
+        }
+
+        .btn-cosmic-primary {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            color: #05040d;
+            font-weight: 800;
+            box-shadow: 0 0 26px var(--accent-glow), inset 0 1px 1px rgba(255, 255, 255, 0.65);
+        }
+
+        .btn-cosmic-primary:hover {
+            box-shadow: 0 0 40px var(--accent-glow), 0 8px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Custom Scrollbar Hide for Realm Navigation Dock */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Floating 3D Hover Tooltip */
+        #world-tooltip {
+            position: fixed;
+            z-index: 40;
+            pointer-events: none;
+            transform: translate(-50%, -135%);
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        #world-tooltip.visible {
+            opacity: 1;
+            transform: translate(-50%, -145%);
+        }
+
+        /* Custom Glowing Cursor (Desktop Pointer Devices Only) */
+        #cursor-dot, #cursor-ring {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 9999;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #cursor-dot {
+            width: 9px;
+            height: 9px;
+            background: #ffffff;
+            box-shadow: 0 0 12px var(--accent-primary), 0 0 24px var(--accent-secondary);
+        }
+
+        #cursor-ring {
+            width: 40px;
+            height: 40px;
+            border: 1.5px solid var(--accent-primary);
+            box-shadow: 0 0 18px var(--accent-glow), inset 0 0 10px var(--accent-glow);
+            transition: width 0.22s ease, height 0.22s ease, border-color 0.25s ease, opacity 0.3s ease;
+        }
+
+        @media (hover: none), (pointer: coarse) {
+            #cursor-dot, #cursor-ring {
+                display: none !important;
+            }
+        }
+
+        /* Modal Transitions */
+        .modal-backdrop {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.38s ease;
+        }
+        .modal-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-card {
+            transform: translateY(22px) scale(0.95);
+            transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .modal-backdrop.open .modal-card {
+            transform: translateY(0) scale(1);
+        }
+
+        /* Subtle Floating Animation */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        .float-slow {
+            animation: floatSlow 4.5s ease-in-out infinite;
+        }
+
+        /* Typewriter & Poetic Scroll Reveal */
+        @keyframes scrollUnfurl {
+            from { opacity: 0; transform: translateY(10px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .poem-reveal {
+            animation: scrollUnfurl 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Pointer Follower -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
+    <!-- Dynamic 3D Object Hover Tooltip -->
+    <div id="world-tooltip" class="glass-panel px-3.5 py-1.5 rounded-xl text-xs font-bold text-amber-200 border border-amber-300/40 whitespace-nowrap shadow-xl">
+        <span id="tooltip-text">عنصر تفاعلي ✨</span>
+    </div>
+
+    <!-- 3D WebGL 6-Realm Universe Canvas -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- 2D Stardust & Aurora Particle Trail Canvas -->
+    <canvas id="stardust-canvas"></canvas>
+
+    <!-- Responsive Safe-Area UI Shell -->
+    <div class="ui-shell">
+
+        <!-- TOP HEADER & 6-REALM PORTAL NAVIGATION BAR -->
+        <header class="w-full max-w-6xl mx-auto flex flex-col gap-2">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <!-- Monogram & Name Badge -->
+                <div class="glass-panel px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl flex items-center gap-2.5 pointer-events-auto">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-royal font-black text-xs sm:text-sm text-black shadow-lg shrink-0"
+                         style="background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));">
+                        WM
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs sm:text-sm font-bold text-white leading-tight flex items-center gap-1.5">
+                            <span>وفاء منصوري</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-amber-200 font-mono">8 Realms 3D</span>
+                        </div>
+                        <div class="text-[9px] font-royal tracking-[0.18em] text-gray-300 mt-0.5">
+                            WAFAE MANSSOURI
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4 Artistic Themes + Orbit + Audio Controls -->
+                <div class="flex items-center gap-1.5 sm:gap-2 pointer-events-auto">
+                    <div class="glass-panel px-2.5 py-1.5 sm:py-2 rounded-2xl flex items-center gap-2" role="group" aria-label="تغيير الثيم الفني">
+                        <button data-theme="cosmicAurora" title="الشفق الكوني • Cosmic Aurora"
+                                class="theme-btn w-4 h-4 sm:w-5 sm:h-5 rounded-full ring-2 ring-white scale-110 transition-transform cursor-pointer"
+                                style="background: linear-gradient(135deg, #34d399, #a855f7);"></button>
+                        <button data-theme="liquidGold" title="الذهب السائل • Liquid Gold"
+                                class="theme-btn w-4 h-4 sm:w-5 sm:h-5 rounded-full opacity-65 hover:opacity-100 transition-transform cursor-pointer"
+                                style="background: linear-gradient(135deg, #ffd700, #f59e0b);"></button>
+                        <button data-theme="cyberNeon" title="سايبربانك نيون • Cyberpunk Neon"
+                                class="theme-btn w-4 h-4 sm:w-5 sm:h-5 rounded-full opacity-65 hover:opacity-100 transition-transform cursor-pointer"
+                                style="background: linear-gradient(135deg, #f43f5e, #06b6d4);"></button>
+                        <button data-theme="etherealCrystal" title="كريستال أثيري • Ethereal Crystal"
+                                class="theme-btn w-4 h-4 sm:w-5 sm:h-5 rounded-full opacity-65 hover:opacity-100 transition-transform cursor-pointer"
+                                style="background: linear-gradient(135deg, #38bdf8, #f472b6);"></button>
+                    </div>
+
+                    <button id="btn-orbit" title="تبديل الدوران التلقائي"
+                            class="magnetic-btn glass-panel px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-2xl text-xs font-bold text-gray-100 hover:border-white/40 flex items-center gap-1.5 cursor-pointer">
+                        <i id="orbit-icon" class="fa-solid fa-compass text-emerald-400"></i>
+                        <span class="hidden md:inline">دوران تلقائي</span>
+                    </button>
+
+                    <button id="btn-audio" title="تشغيل / إيقاف الصوتيات التفاعلية"
+                            class="magnetic-btn glass-panel px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-2xl text-xs font-bold text-gray-100 hover:border-white/40 flex items-center gap-1.5 cursor-pointer">
+                        <i id="audio-icon" class="fa-solid fa-volume-xmark text-gray-400"></i>
+                        <span id="audio-label" class="hidden sm:inline">ألحان كونية</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 6-REALM PORTAL NAVIGATION DOCK -->
+            <nav id="realms-nav" class="mx-auto max-w-full overflow-x-auto no-scrollbar glass-panel p-1.5 rounded-2xl flex items-center gap-1 pointer-events-auto shadow-2xl">
+                <!-- Populated dynamically by JS -->
+            </nav>
+        </header>
+
+        <!-- DYNAMIC REALM HEADER SECTION -->
+        <section class="w-full max-w-4xl mx-auto text-center mt-1.5 px-2">
+            <div class="inline-flex items-center gap-2 px-3.5 py-0.5 rounded-full glass-panel text-[11px] sm:text-xs text-amber-200 mb-1 float-slow">
+                <i id="realm-badge-icon" class="fa-solid fa-crown text-amber-300"></i>
+                <span id="realm-badge-text">العالم 1 من 6 • عرش النور والقلب الملكي</span>
+            </div>
+            <h1 id="realm-title" class="hero-arabic-title font-amiri font-bold tracking-tight">
+                عرش النور والقلب الملكي
+            </h1>
+            <p id="realm-subtitle" class="hero-subtitle font-playfair italic mt-0.5">
+                Throne of Light & Royal Heart • Wafae Manssouri
+            </p>
+        </section>
+
+        <!-- OPEN CENTER 3D STAGE (Unobstructed for full mouse/touch 3D sculpture interaction) -->
+        <div class="flex-1 min-h-[32dvh] sm:min-h-[38dvh] w-full"></div>
+
+        <!-- BOTTOM INTERACTIVE CONTROL DOCK & REALM-SPECIFIC CONTROLS -->
+        <footer class="w-full max-w-4xl mx-auto flex flex-col items-center gap-2 pb-1">
+            <!-- Realm-Specific Interactive Action Bar (Changes dynamically per world!) -->
+            <div id="realm-actions-bar" class="flex flex-wrap items-center justify-center gap-2 pointer-events-auto">
+                <!-- Populated dynamically per active realm -->
+            </div>
+
+            <!-- Poetic & Interactive Status Strip -->
+            <div id="poetry-strip" class="tilt-card glass-panel w-full max-w-2xl rounded-2xl px-4 py-2.5 text-center pointer-events-auto transition-all duration-300">
+                <p id="dynamic-quote" class="font-amiri text-sm sm:text-base md:text-lg text-amber-100 leading-snug">
+                    "كل عام وأنتِ نجمة تضيء سماء من حولكِ بالرقيّ والتوازن والنجاح الدائم يا وفاء ✨"
+                </p>
+            </div>
+
+            <!-- Global Realm Stepper & Quick Utilities -->
+            <div class="w-full flex items-center justify-between gap-2 px-1 pointer-events-auto">
+                <button id="btn-prev-realm" class="magnetic-btn glass-panel px-3.5 py-2 rounded-xl text-xs font-bold text-gray-200 hover:border-white/40 flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    <span>العالم السابق</span>
+                </button>
+
+                <div class="flex items-center gap-2">
+                    <button id="btn-shockwave" title="نبضة طاقة كونية"
+                            class="magnetic-btn glass-panel px-3.5 py-2 rounded-xl text-xs font-bold text-white hover:border-white/45 flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-atom animate-spin" style="animation-duration: 6s; color: var(--accent-primary);"></i>
+                        <span class="hidden sm:inline">نبضة كونية</span>
+                    </button>
+
+                    <button id="btn-toggle-strip" title="إخفاء / إظهار البطاقة"
+                            class="magnetic-btn glass-panel px-3 py-2 rounded-xl text-xs font-bold text-gray-200 hover:border-white/45 cursor-pointer">
+                        <i id="strip-icon" class="fa-solid fa-eye-slash"></i>
+                    </button>
+                </div>
+
+                <button id="btn-next-realm" class="magnetic-btn btn-cosmic-primary px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer">
+                    <span>العالم التالي</span>
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ARTIFACT / WISH / SUPERNOVA MODAL -->
+    <div id="wish-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/78 backdrop-blur-md">
+        <div class="modal-card tilt-card glass-panel max-w-lg w-full rounded-3xl p-6 sm:p-8 text-center relative border border-white/25">
+            <button id="btn-close-modal" aria-label="إغلاق"
+                    class="absolute top-4 left-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-gray-200 flex items-center justify-center cursor-pointer transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="w-14 h-14 mx-auto mb-3.5 rounded-2xl flex items-center justify-center text-2xl text-black shadow-xl"
+                 style="background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));">
+                <i id="modal-icon" class="fa-solid fa-crown"></i>
+            </div>
+
+            <p id="modal-tag" class="font-royal text-[10px] sm:text-xs tracking-[0.24em] text-amber-300 uppercase mb-1">
+                Celestial Birthday Tribute
+            </p>
+            <h2 id="modal-title" class="font-amiri text-2xl sm:text-4xl font-bold text-white mb-3">
+                كل عام وأنتِ بألف خير يا وفاء منصوري!
+            </h2>
+
+            <p id="modal-body" class="font-amiri text-lg sm:text-xl text-amber-50/95 leading-relaxed mb-6">
+                في هذا اليوم المميز، يحتفي بكِ هذا الكون الرقمي متمنياً لكِ عاماً جديداً يفيض بالصحة، السكينة، والتألق في كل خطوة تخطينها. 🎂✨
+            </p>
+
+            <div class="flex flex-wrap items-center justify-center gap-2.5">
+                <button id="btn-more-fireworks"
+                        class="magnetic-btn btn-cosmic-primary px-6 py-2.5 rounded-xl text-xs sm:text-sm flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-sparkles"></i>
+                    <span>إطلاق ألعاب نارية</span>
+                </button>
+                <button id="btn-modal-close-action"
+                        class="magnetic-btn glass-panel px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white hover:border-white/40 cursor-pointer">
+                    متابعة الاستكشاف
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================================
+        // 1. REALMS CONFIGURATION, THEMES & POETIC CONTENT
+        // =========================================================================
+        const THEMES = {
+            cosmicAurora: {
+                primaryHex: 0x34d399, secondaryHex: 0xa855f7, tertiaryHex: 0x38bdf8, bgHex: 0x03030c,
+                cssPrimary: '#34d399', cssSecondary: '#a855f7', cssGlow: 'rgba(52, 211, 153, 0.45)', cssBg: '#03030c',
+                skyA: [0.01, 0.02, 0.07], skyB: [0.05, 0.28, 0.22], skyC: [0.22, 0.06, 0.34]
+            },
+            liquidGold: {
+                primaryHex: 0xffd700, secondaryHex: 0xf59e0b, tertiaryHex: 0xfb7185, bgHex: 0x07040a,
+                cssPrimary: '#ffd700', cssSecondary: '#f59e0b', cssGlow: 'rgba(255, 215, 0, 0.48)', cssBg: '#07040a',
+                skyA: [0.03, 0.01, 0.05], skyB: [0.28, 0.17, 0.02], skyC: [0.18, 0.05, 0.14]
+            },
+            cyberNeon: {
+                primaryHex: 0xf43f5e, secondaryHex: 0x06b6d4, tertiaryHex: 0xc084fc, bgHex: 0x06020e,
+                cssPrimary: '#f43f5e', cssSecondary: '#06b6d4', cssGlow: 'rgba(244, 63, 94, 0.48)', cssBg: '#06020e',
+                skyA: [0.04, 0.01, 0.08], skyB: [0.32, 0.03, 0.18], skyC: [0.02, 0.24, 0.32]
+            },
+            etherealCrystal: {
+                primaryHex: 0x38bdf8, secondaryHex: 0xf472b6, tertiaryHex: 0xe0f2fe, bgHex: 0x030712,
+                cssPrimary: '#38bdf8', cssSecondary: '#f472b6', cssGlow: 'rgba(56, 189, 248, 0.45)', cssBg: '#030712',
+                skyA: [0.01, 0.03, 0.09], skyB: [0.06, 0.22, 0.35], skyC: [0.22, 0.10, 0.28]
+            }
+        };
+
+        const REALMS = [
+            {
+                id: 'throne',
+                shortName: 'عرش النور',
+                icon: 'fa-crown',
+                title: 'عرش النور والقلب الملكي',
+                subtitle: 'Throne of Light & Royal Heart • Wafae Manssouri',
+                quote: '"كل عام وأنتِ نجمة تضيء سماء من حولكِ بالرقيّ والتوازن والنجاح الدائم يا وفاء ✨"',
+                camPos: [0, 0.6, 9.2],
+                camTarget: [0, 0, 0]
+            },
+            {
+                id: 'lotus',
+                shortName: 'حديقة اللوتس',
+                icon: 'fa-spa',
+                title: 'حديقة اللوتس والأحلام الكريستالية',
+                subtitle: 'Crystal Lotus & Floating Gardens • Éclosion',
+                quote: '"اقتربي بالمؤشر أو إصبعكِ من زهور اللوتس الكريستالية لتتفتح بتلاتها وتنثر الأمنيات 🌸"',
+                camPos: [0, 2.2, 9.6],
+                camTarget: [0, -0.3, 0]
+            },
+            {
+                id: 'observatory',
+                shortName: 'مرصد النجوم',
+                icon: 'fa-star',
+                title: 'مرصد الأبراج وكتابة الاسم بالنجوم',
+                subtitle: 'Constellation Observatory • WAFAE & وفاء',
+                quote: '"نجوم السماء ترسم اسمكِ في الفضاء.. بدّلي بين WAFAE و وفاء وأطلقي الشهب الذهبية 🌠"',
+                camPos: [0, 0.5, 10.2],
+                camTarget: [0, 0.2, 0]
+            },
+            {
+                id: 'harp',
+                shortName: 'قيثارة النور',
+                icon: 'fa-music',
+                title: 'قصر الموسيقى والأوتار الضوئية',
+                subtitle: 'Symphony of Light & Interactive Cosmic Harp',
+                quote: '"مرّري المؤشر أو إصبعكِ عبر الأوتار الليزرية الـ 12 لتعزفي ألحان عيد ميلادكِ 🎶"',
+                camPos: [0, 0.7, 9.0],
+                camTarget: [0, 0.2, 0]
+            },
+            {
+                id: 'gallery',
+                shortName: 'متحف الهدايا',
+                icon: 'fa-gem',
+                title: 'متحف الذكريات والهدايا السحرية',
+                subtitle: 'Gallery of Floating Monoliths & Crystal Gifts',
+                quote: '"انقري على أي مسلة زجاجية أو بلورة هدية طافية لفتح رسالة تقدير خاصة بكِ 💎"',
+                camPos: [0, 0.8, 10.5],
+                camTarget: [0, 0.1, 0]
+            },
+            {
+                id: 'supernova',
+                shortName: 'كعكة السوبرنوفا',
+                icon: 'fa-cake-candles',
+                title: 'احتفالية السوبرنوفا وكعكة النجوم',
+                subtitle: 'Grand Supernova & Celestial Birthday Finale',
+                quote: '"تمنّي أمنية جميلة وأطفئي الشموع الذهبية لتفجير سوبرنوفا الاحتفال الكبرى 🎂🎆"',
+                camPos: [0, 1.8, 9.5],
+                camTarget: [0, 0.4, 0]
+            },
+            {
+                id: 'justice',
+                shortName: 'معبد العدالة',
+                icon: 'fa-scale-balanced',
+                title: 'معبد العدالة والمجد • جامعة القاضي عياض',
+                subtitle: 'Temple of Justice & Law • Université Cadi Ayyad Marrakech',
+                quote: '"فخر كلية الحقوق بجامعة القاضي عياض بمراكش.. حيث يلتقي ميزان العدالة برقيّ الفكر وأناقة الحضور ⚖️🏛️"',
+                camPos: [0, 1.2, 10.4],
+                camTarget: [0, 0.2, 0]
+            },
+            {
+                id: 'poems',
+                shortName: 'سماء القصائد',
+                icon: 'fa-feather-pointed',
+                title: 'سماء القصائد والكلمات الخالدة',
+                subtitle: 'Sanctuary of Poetic Words & Celestial Wings • Wafae',
+                quote: '"يا وفاء.. أنتِ قصيدة من نور، وروحٌ تشبه السماء في صفائها والورد في رقتها ✨🕊️"',
+                camPos: [0, 1.1, 10.2],
+                camTarget: [0, 0.25, 0]
+            }
+        ];
+
+        const JUSTICE_PILLARS = [
+            {
+                icon: 'fa-building-columns',
+                tag: 'FSJES • UCA MARRAKECH',
+                title: 'فخر جامعة القاضي عياض بمراكش',
+                body: 'مسارٌ جامعي مشرّف في رحاب كلية العلوم القانونية والاقتصادية والاجتماعية بمراكش؛ حيث صُقلت شخصيتكِ بالعلم، الرصانة، وروح القيادة.'
+            },
+            {
+                icon: 'fa-scale-balanced',
+                tag: 'JUSTITIA • ميزان العدالة',
+                title: 'ركن العدالة والإنصاف',
+                body: 'دراسة القانون ليست مجرد نصوص، بل هي رسالة سامية لا تليق إلا بأصحاب العقول الراجحة والقلوب النبيلة مثلكِ يا وفاء.'
+            },
+            {
+                icon: 'fa-book-open',
+                tag: 'VERITAS • نور الحق',
+                title: 'ركن الحق والوضوح',
+                body: 'بصيرة ثاقبة تميّز الصواب وتنصر الحق بهدوء الواثقين وحكمة العارفين.. صفة تزيدكِ هيبة واحتراماً في كل مجلس.'
+            },
+            {
+                icon: 'fa-feather',
+                tag: 'ELOQUENTIA • بلاغة البيان',
+                title: 'ركن الفصاحة والحجة',
+                body: 'أسلوب راقٍ وحضور متزن يجعل لكلماتكِ أثراً طيباً وإقناعاً سلساً يعكس ثقافتكِ القانونية الرفيعة.'
+            },
+            {
+                icon: 'fa-shield-halved',
+                tag: 'INTEGRITAS • النزاهة والشرف',
+                title: 'ركن المبادئ الثابتة',
+                body: 'اسمكِ "وفاء" يحمل أجمل معاني الوفاء للمبادئ والأخلاق والقيم النبيلة في كل خطوة من حياتكِ.'
+            },
+            {
+                icon: 'fa-award',
+                tag: 'EXCELLENCE • أفق المجد',
+                title: 'مستقبل يليق بطموحكِ',
+                body: 'في يوم ميلادكِ، كل الأمنيات بأن تفتحي أوسع أبواب التميز والنجاح في مساركِ القانوني والمهني نحو أعلى المراتب.'
+            }
+        ];
+
+        const POETIC_TRIBUTES = [
+            {
+                tag: 'رسالة من القلب • 1',
+                title: 'إلى صاحبة القلب النقي والحضور الملكي',
+                text: '"يا وفاء، في يوم ميلادكِ تتزيّن الكلمات فخراً بكِ؛ فأنتِ الأخت التي تُشبه النور في صفائه، والسند الذي يبعث الطمأنينة والبهجة أينما حلّ."'
+            },
+            {
+                tag: 'قصيدة التقدير • 2',
+                title: 'نجمةٌ تضيء سماء العائلة',
+                text: '"كل عام وأنتِ أجمل حكاية نجاح، وأرقى روحٍ تجمع بين قوة العقل ورقة المشاعر.. دمتِ متألقة كما عهدناكِ دائماً يا وفاء منصوري."'
+            },
+            {
+                tag: 'إشراقة العام الجديد • 3',
+                title: 'أمنية تليق بجمال روحكِ',
+                text: '"عسى أن يحمل لكِ عامكِ الجديد أياماً تشبه ابتسامتكِ الصافية، وأحلاماً تتحقق تباعاً كما تتفتح أزهار الربيع في سماء مراكش."'
+            },
+            {
+                tag: 'فخر واعتزاز • 4',
+                title: 'بين رصانة القانون ورقة الوجدان',
+                text: '"نادرون هم من يجمعون بين هيبة الفكر القانوني ودفء الإنسانية مثلكِ.. كل عام وأنتِ مصدر إلهام وفخر لنا جميعاً."'
+            },
+            {
+                tag: 'دعوة صادقة • 5',
+                title: 'سعادةٌ لا تغيب وتوفيقٌ لا ينقطع',
+                text: '"في عيد ميلادكِ، ندعو الله أن يكتب لكِ الخير في كل خطوة، وأن يملأ حياتكِ بالسكينة والرضا والإنجازات التي تسرّ قلبكِ."'
+            },
+            {
+                tag: 'تحية خالدة • 6',
+                title: 'وفاء.. اسمٌ على مسمّى',
+                text: '"لكِ من الاسم نصيب، ومن الأخلاق أعلاها، ومن المكانة أرفعها.. عيد ميلاد سعيد يا أغلى الناس وأجملهم روحاً."'
+            }
+        ];
+
+        const MONOLITH_ARTIFACTS = [
+            {
+                icon: 'fa-crown',
+                tag: 'HONNEUR & ÉLÉGANCE',
+                title: 'مكانة الأخت الكبرى',
+                body: 'إلى وفاء منصوري.. حضوركِ يبعث على الاطمئنان والرقيّ، ومكانتكِ في العائلة مصدر اعتزاز وفخر لا ينتهي.'
+            },
+            {
+                icon: 'fa-scale-balanced',
+                tag: 'HARMONIE & SAGESSE',
+                title: 'ميزان الحكمة والرؤية',
+                body: 'عقلٌ متزن يزن الأمور بحكمة وهدوء، وشخصية تجمع بين اللطف والقوة في كل موقف.'
+            },
+            {
+                icon: 'fa-star',
+                tag: 'ÉTOILE BRILLANTE',
+                title: 'نجمة التألق المستمر',
+                body: 'في يوم ميلادكِ، نتمنى لكِ عاماً يزهر بالإنجازات الكبيرة والفرص التي تليق بطموحكِ.'
+            },
+            {
+                icon: 'fa-heart',
+                tag: 'AFFECTION SINCÈRE',
+                title: 'تقدير ومحبة صادقة',
+                body: 'كل عام وأنتِ بخير وصحة وسعادة، وعسى أن تظل الابتسامة رفيقة أيامكِ دائماً.'
+            },
+            {
+                icon: 'fa-gem',
+                tag: 'ESPRIT PRÉCIEUX',
+                title: 'جوهرة نادرة في العائلة',
+                body: 'بعض الأشخاص يتركون أثراً جميلاً أينما حلّوا، وأنتِ يا وفاء في مقدمتهم دائماً.'
+            },
+            {
+                icon: 'fa-wand-magic-sparkles',
+                tag: 'NOUVEAU CHAPITRE',
+                title: 'بداية فصل جديد مشرق',
+                body: 'عام جديد من العمر يحمل لكِ أجمل المفاجآت السعيدة وتحقيق كل ما تتمنينه.'
+            }
+        ];
+
+        const LOTUS_WISHES = [
+            'بتلة السكينة: عام يملؤه الهدوء وراحة البال والرضا 🌸',
+            'بتلة النجاح: خطوات واثقة نحو أعلى القمم في مساركِ ✨',
+            'بتلة السعادة: لحظات جميلة لا تُنسى مع من تحبين 💖',
+            'بتلة الصحة: دوام العافية والقوة والتألق كل يوم 🌿',
+            'بتلة الإلهام: طاقة إيجابية تفتح لكِ أبواب الإبداع 🌟',
+            'بتلة الفرح: عيد ميلاد سعيد يليق بجمال روحكِ يا وفاء 🎂'
+        ];
+
+        const AppState = {
+            realmIdx: 0,
+            themeKey: 'cosmicAurora',
+            autoOrbit: true,
+            audioEnabled: false,
+            starShapeMode: 'wafaeEn', // 'wafaeEn' | 'wafaeAr' | 'heart'
+            candlesLit: true,
+            shockwaveEnergy: 0,
+            celebrationBoost: 0,
+            audioPulse: 0,
+            gavelStrikeEnergy: 0,
+            scalesBalanceBias: 0,
+            poemIndex: 0,
+            wingFlutterBoost: 0
+        };
+
+        // =========================================================================
+        // 2. PROCEDURAL WEB AUDIO API HARMONIC & HARP SYNTHESIZER
+        // =========================================================================
+        class CosmicSoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.master = null;
+                this.ambientTimer = null;
+                this.step = 0;
+                // 12-note lush Lydian / Pentatonic Harp Scale
+                this.harpNotes = [
+                    261.63, 293.66, 329.63, 392.00, 440.00, 523.25,
+                    587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66
+                ];
+            }
+
+            ensureContext() {
+                try {
+                    if (!this.ctx) {
+                        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                        if (!AudioCtx) return false;
+                        this.ctx = new AudioCtx();
+                        this.master = this.ctx.createGain();
+                        this.master.gain.setValueAtTime(0.55, this.ctx.currentTime);
+                        this.master.connect(this.ctx.destination);
+                    }
+                    if (this.ctx.state === 'suspended') {
+                        this.ctx.resume();
+                    }
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            playHarpString(stringIndex, forceSound = false) {
+                if (!AppState.audioEnabled && !forceSound) return;
+                if (!this.ensureContext()) return;
+
+                const freq = this.harpNotes[stringIndex % this.harpNotes.length];
+                const now = this.ctx.currentTime;
+                AppState.audioPulse = Math.min(1.0, AppState.audioPulse + 0.42);
+
+                const osc1 = this.ctx.createOscillator();
+                const osc2 = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                const overtoneGain = this.ctx.createGain();
+
+                osc1.type = 'triangle';
+                osc1.frequency.setValueAtTime(freq, now);
+
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(freq * 2, now);
+                overtoneGain.gain.setValueAtTime(0.28, now);
+
+                gain.gain.setValueAtTime(0.0001, now);
+                gain.gain.linearRampToValueAtTime(0.16, now + 0.015);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.5);
+
+                osc1.connect(gain);
+                osc2.connect(overtoneGain);
+                overtoneGain.connect(gain);
+                gain.connect(this.master);
+
+                osc1.start(now);
+                osc2.start(now);
+                osc1.stop(now + 1.55);
+                osc2.stop(now + 1.55);
+            }
+
+            playChime(freq = null, duration = 1.1, volume = 0.13) {
+                if (!AppState.audioEnabled) return;
+                if (!this.ensureContext()) return;
+                const f = freq || this.harpNotes[4 + Math.floor(Math.random() * 8)];
+                const now = this.ctx.currentTime;
+                AppState.audioPulse = Math.min(1.0, AppState.audioPulse + 0.35);
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(f, now);
+
+                gain.gain.setValueAtTime(0.0001, now);
+                gain.gain.linearRampToValueAtTime(volume, now + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+                osc.connect(gain);
+                gain.connect(this.master);
+                osc.start(now);
+                osc.stop(now + duration + 0.05);
+            }
+
+            playSupernovaChord() {
+                if (!AppState.audioEnabled) return;
+                [5, 7, 8, 10, 11].forEach((idx, i) => {
+                    setTimeout(() => this.playHarpString(idx, true), i * 65);
+                });
+            }
+
+            playGavelStrikeSound() {
+                this.ensureContext();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                AppState.audioPulse = 1.0;
+
+                // Deep resonant wooden block thud
+                const subOsc = this.ctx.createOscillator();
+                const subGain = this.ctx.createGain();
+                subOsc.type = 'triangle';
+                subOsc.frequency.setValueAtTime(175, now);
+                subOsc.frequency.exponentialRampToValueAtTime(48, now + 0.22);
+
+                subGain.gain.setValueAtTime(0.55, now);
+                subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+                subOsc.connect(subGain);
+                subGain.connect(this.master);
+                subOsc.start(now);
+                subOsc.stop(now + 0.3);
+
+                // Crystalline golden chime resonance after gavel impact
+                setTimeout(() => {
+                    this.playHarpString(8, true);
+                    setTimeout(() => this.playHarpString(11, true), 55);
+                }, 70);
+            }
+
+            startAmbient() {
+                AppState.audioEnabled = true;
+                this.ensureContext();
+                this.updateUI();
+                this.playSupernovaChord();
+                clearInterval(this.ambientTimer);
+                const pattern = [5, 7, 8, 10, 8, 7, 6, 8];
+                this.ambientTimer = setInterval(() => {
+                    if (!AppState.audioEnabled) return;
+                    this.playHarpString(pattern[this.step % pattern.length]);
+                    this.step++;
+                }, 900);
+            }
+
+            stopAmbient() {
+                AppState.audioEnabled = false;
+                clearInterval(this.ambientTimer);
+                this.updateUI();
+            }
+
+            toggle() {
+                if (AppState.audioEnabled) this.stopAmbient();
+                else this.startAmbient();
+            }
+
+            updateUI() {
+                const icon = document.getElementById('audio-icon');
+                const label = document.getElementById('audio-label');
+                if (icon) {
+                    icon.className = AppState.audioEnabled
+                        ? 'fa-solid fa-music text-amber-300 animate-bounce'
+                        : 'fa-solid fa-volume-xmark text-gray-400';
+                }
+                if (label) {
+                    label.textContent = AppState.audioEnabled ? 'إيقاف الصوت' : 'ألحان كونية';
+                }
+            }
+        }
+
+        const soundEngine = new CosmicSoundEngine();
+
+        // =========================================================================
+        // 3. 2D CANVAS STARDUST TRAIL, RIPPLES & 3D FIREWORKS OVERLAY
+        // =========================================================================
+        class StardustOverlay2D {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.particles = [];
+                this.ripples = [];
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+            }
+
+            resize() {
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                this.width = window.innerWidth;
+                this.height = window.innerHeight;
+                this.canvas.width = this.width * dpr;
+                this.canvas.height = this.height * dpr;
+                this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            spawnTrail(x, y, count = 2) {
+                const theme = THEMES[AppState.themeKey];
+                for (let i = 0; i < count; i++) {
+                    if (this.particles.length > 260) this.particles.shift();
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 0.4 + Math.random() * 1.4;
+                    this.particles.push({
+                        x, y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed - 0.5,
+                        size: 1.8 + Math.random() * 3.0,
+                        life: 1.0,
+                        decay: 0.022 + Math.random() * 0.018,
+                        color: Math.random() > 0.35 ? theme.cssPrimary : (Math.random() > 0.5 ? theme.cssSecondary : '#ffffff'),
+                        isConfetti: false
+                    });
+                }
+            }
+
+            spawnBurst(x, y, count = 36, isSupernova = false) {
+                const theme = THEMES[AppState.themeKey];
+                this.ripples.push({
+                    x, y, radius: 8, maxRadius: isSupernova ? 280 : 135, life: 1.0, color: theme.cssPrimary
+                });
+
+                const palette = [theme.cssPrimary, theme.cssSecondary, '#ffd700', '#ffffff', '#fb7185', '#38bdf8'];
+                for (let i = 0; i < count; i++) {
+                    if (this.particles.length > 360) this.particles.shift();
+                    const angle = (i / count) * Math.PI * 2 + Math.random() * 0.3;
+                    const speed = (isSupernova ? 2.5 : 1.5) + Math.random() * (isSupernova ? 7.0 : 3.5);
+                    this.particles.push({
+                        x, y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed - (isSupernova ? 2.2 : 0.8),
+                        size: isSupernova ? (3 + Math.random() * 4.5) : (2 + Math.random() * 3.5),
+                        life: 1.0,
+                        decay: isSupernova ? (0.011 + Math.random() * 0.009) : (0.02 + Math.random() * 0.015),
+                        color: palette[i % palette.length],
+                        isConfetti: isSupernova && i % 2 === 0,
+                        rot: Math.random() * Math.PI * 2,
+                        vRot: (Math.random() - 0.5) * 0.2
+                    });
+                }
+            }
+
+            updateAndRender() {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+
+                for (let i = this.ripples.length - 1; i >= 0; i--) {
+                    const r = this.ripples[i];
+                    r.radius += (r.maxRadius - r.radius) * 0.09;
+                    r.life -= 0.025;
+                    if (r.life <= 0) {
+                        this.ripples.splice(i, 1);
+                        continue;
+                    }
+                    this.ctx.save();
+                    this.ctx.beginPath();
+                    this.ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+                    this.ctx.strokeStyle = r.color;
+                    this.ctx.globalAlpha = r.life * 0.65;
+                    this.ctx.lineWidth = 2;
+                    this.ctx.stroke();
+                    this.ctx.restore();
+                }
+
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.isConfetti) {
+                        p.vy += 0.08;
+                        p.vx *= 0.98;
+                        p.rot += p.vRot;
+                    } else {
+                        p.vx *= 0.96;
+                        p.vy *= 0.96;
+                    }
+                    p.life -= p.decay;
+
+                    if (p.life <= 0) {
+                        this.particles.splice(i, 1);
+                        continue;
+                    }
+
+                    this.ctx.save();
+                    this.ctx.globalAlpha = Math.max(0, p.life);
+                    this.ctx.fillStyle = p.color;
+                    this.ctx.shadowColor = p.color;
+                    this.ctx.shadowBlur = 10;
+
+                    if (p.isConfetti) {
+                        this.ctx.translate(p.x, p.y);
+                        this.ctx.rotate(p.rot);
+                        this.ctx.fillRect(-p.size, -p.size * 0.5, p.size * 2, p.size);
+                    } else {
+                        this.ctx.beginPath();
+                        this.ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    }
+                    this.ctx.restore();
+                }
+            }
+        }
+
+        // =========================================================================
+        // 4. MASSIVE 6-REALM THREE.JS 3D UNIVERSE ENGINE
+        // =========================================================================
+        function initSixRealmUniverse(stardust2D) {
+            const canvas = document.getElementById('webgl-canvas');
+            const isMobile = window.innerWidth < 768;
+
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(THEMES[AppState.themeKey].bgHex, 0.018);
+
+            const camera = new THREE.PerspectiveCamera(
+                isMobile ? 62 : 52,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(0, 0.6, isMobile ? 11.4 : 9.2);
+
+            const renderer = new THREE.WebGLRenderer({
+                canvas,
+                antialias: !isMobile,
+                alpha: true,
+                powerPreference: 'high-performance'
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.25;
+
+            // --- Aurora GLSL Sky Dome ---
+            const skyUniforms = {
+                uTime: { value: 0 },
+                uEnergy: { value: 0 },
+                uColorA: { value: new THREE.Color(...THEMES.cosmicAurora.skyA) },
+                uColorB: { value: new THREE.Color(...THEMES.cosmicAurora.skyB) },
+                uColorC: { value: new THREE.Color(...THEMES.cosmicAurora.skyC) }
+            };
+
+            const skyDome = new THREE.Mesh(
+                new THREE.SphereGeometry(75, 32, 32),
+                new THREE.ShaderMaterial({
+                    side: THREE.BackSide,
+                    depthWrite: false,
+                    uniforms: skyUniforms,
+                    vertexShader: `
+                        varying vec3 vWorldPos;
+                        void main() {
+                            vec4 wp = modelMatrix * vec4(position, 1.0);
+                            vWorldPos = wp.xyz;
+                            gl_Position = projectionMatrix * viewMatrix * wp;
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform float uTime;
+                        uniform float uEnergy;
+                        uniform vec3 uColorA;
+                        uniform vec3 uColorB;
+                        uniform vec3 uColorC;
+                        varying vec3 vWorldPos;
+                        void main() {
+                            vec3 d = normalize(vWorldPos);
+                            float wave1 = sin(d.x * 3.5 + uTime * 0.32) * cos(d.z * 3.2 - uTime * 0.25);
+                            float wave2 = sin(d.y * 4.8 + wave1 * 2.1 + uTime * 0.42);
+                            float aurora = smoothstep(0.12, 0.92, wave2 * 0.5 + 0.5);
+                            vec3 col = mix(uColorA, uColorB, aurora * (0.65 + uEnergy * 0.35));
+                            col = mix(col, uColorC, smoothstep(-0.35, 0.85, d.y + wave1 * 0.22) * 0.62);
+                            gl_FragColor = vec4(col, 1.0);
+                        }
+                    `
+                })
+            );
+            scene.add(skyDome);
+
+            // --- Dynamic Lighting ---
+            scene.add(new THREE.AmbientLight(0xffffff, 0.68));
+            const keyLight = new THREE.DirectionalLight(0xfff5d6, 1.85);
+            keyLight.position.set(6, 11, 8);
+            scene.add(keyLight);
+
+            const primaryLight = new THREE.PointLight(0x34d399, 3.5, 32);
+            primaryLight.position.set(4, 4, 5);
+            scene.add(primaryLight);
+
+            const secondaryLight = new THREE.PointLight(0xa855f7, 3.2, 32);
+            secondaryLight.position.set(-4, -2, 4);
+            scene.add(secondaryLight);
+
+            // --- Shared Luxury Materials ---
+            const coreMat = new THREE.MeshPhysicalMaterial({
+                color: 0x34d399, emissive: 0x064e3b, emissiveIntensity: 0.55,
+                metalness: 0.25, roughness: 0.12, clearcoat: 1.0
+            });
+            const secondaryMat = new THREE.MeshPhysicalMaterial({
+                color: 0xa855f7, emissive: 0x3b0764, emissiveIntensity: 0.5,
+                metalness: 0.35, roughness: 0.14, clearcoat: 1.0
+            });
+            const goldMat = new THREE.MeshStandardMaterial({
+                color: 0xffd700, metalness: 0.92, roughness: 0.15,
+                emissive: 0x452700, emissiveIntensity: 0.38
+            });
+            const crystalGlassMat = new THREE.MeshPhysicalMaterial({
+                color: 0xe0f2fe, emissive: 0x0c4a6e, emissiveIntensity: 0.3,
+                metalness: 0.1, roughness: 0.08, transparent: true, opacity: 0.72, clearcoat: 1.0
+            });
+            const velvetCakeMat = new THREE.MeshPhysicalMaterial({
+                color: 0x160c2b, roughness: 0.28, metalness: 0.25, clearcoat: 0.85
+            });
+
+            // Shared Heart Geometry
+            const hShape = new THREE.Shape();
+            hShape.moveTo(0.25, 0.25);
+            hShape.bezierCurveTo(0.25, 0.25, 0.20, 0, 0, 0);
+            hShape.bezierCurveTo(-0.30, 0, -0.30, 0.35, -0.30, 0.35);
+            hShape.bezierCurveTo(-0.30, 0.55, -0.10, 0.77, 0.25, 0.95);
+            hShape.bezierCurveTo(0.60, 0.77, 0.80, 0.55, 0.80, 0.35);
+            hShape.bezierCurveTo(0.80, 0.35, 0.80, 0, 0.50, 0);
+            hShape.bezierCurveTo(0.35, 0, 0.25, 0.25, 0.25, 0.25);
+            const heartGeo = new THREE.ExtrudeGeometry(hShape, {
+                depth: 0.32, bevelEnabled: true, bevelSegments: 5, bevelSize: 0.07, bevelThickness: 0.07
+            });
+            heartGeo.center();
+            heartGeo.rotateZ(Math.PI);
+
+            // Global Raycast Interactive Registry
+            const interactiveMeshes = [];
+
+            // =====================================================================
+            // REALM 1: THRONE OF LIGHT & ROYAL HEART (عرش النور والقلب الملكي)
+            // =====================================================================
+            const realmThrone = new THREE.Group();
+            scene.add(realmThrone);
+
+            const heartMesh = new THREE.Mesh(heartGeo, coreMat);
+            heartMesh.scale.set(1.75, 1.75, 1.75);
+            heartMesh.userData = { label: 'القلب الكريستالي الملكي 💖', type: 'throneHeart' };
+            interactiveMeshes.push(heartMesh);
+            realmThrone.add(heartMesh);
+
+            // Crown
+            const crownGroup = new THREE.Group();
+            crownGroup.position.y = 1.55;
+            crownGroup.add(new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.52, 0.24, 32, 1, true), goldMat));
+            for (let i = 0; i < 8; i++) {
+                const a = (i / 8) * Math.PI * 2;
+                const spike = new THREE.Mesh(new THREE.ConeGeometry(0.10, 0.34, 4), goldMat);
+                spike.position.set(Math.cos(a) * 0.56, 0.25, Math.sin(a) * 0.56);
+                const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.065, 0), i % 2 === 0 ? coreMat : secondaryMat);
+                gem.position.set(Math.cos(a) * 0.56, 0.46, Math.sin(a) * 0.56);
+                crownGroup.add(spike, gem);
+            }
+            realmThrone.add(crownGroup);
+
+            // Balance Beam
+            const balancePivot = new THREE.Group();
+            balancePivot.position.y = -1.35;
+            const balanceBeam = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 3.6, 20), goldMat);
+            balanceBeam.rotation.z = Math.PI / 2;
+            const leftOrb = new THREE.Mesh(new THREE.OctahedronGeometry(0.24, 1), coreMat);
+            leftOrb.position.set(-1.8, -0.35, 0);
+            const rightOrb = new THREE.Mesh(new THREE.OctahedronGeometry(0.24, 1), secondaryMat);
+            rightOrb.position.set(1.8, -0.35, 0);
+            balancePivot.add(
+                balanceBeam,
+                leftOrb,
+                new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.35, 8), goldMat).translateX(-1.8).translateY(-0.17),
+                rightOrb,
+                new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.35, 8), goldMat).translateX(1.8).translateY(-0.17)
+            );
+            realmThrone.add(balancePivot);
+
+            // Gyroscope Rings & 24 Orbiting Gems
+            const tRing1 = new THREE.Mesh(new THREE.TorusGeometry(2.35, 0.026, 16, 100), goldMat);
+            tRing1.rotation.x = Math.PI / 2.7;
+            const tRing2 = new THREE.Mesh(new THREE.TorusGeometry(2.75, 0.020, 16, 100), secondaryMat);
+            tRing2.rotation.y = Math.PI / 3.2;
+            const tRing3 = new THREE.Mesh(new THREE.TorusGeometry(3.15, 0.015, 16, 100), coreMat);
+            tRing3.rotation.x = -Math.PI / 3.5;
+            realmThrone.add(tRing1, tRing2, tRing3);
+
+            const throneGems = [];
+            const gemGeo = new THREE.OctahedronGeometry(0.12, 0);
+            for (let i = 0; i < 24; i++) {
+                const mat = i % 3 === 0 ? goldMat : (i % 3 === 1 ? coreMat : secondaryMat);
+                const m = new THREE.Mesh(gemGeo, mat);
+                realmThrone.add(m);
+                throneGems.push({
+                    mesh: m,
+                    angle: (i / 24) * Math.PI * 2,
+                    radius: 2.35 + (i % 4) * 0.28,
+                    speed: 0.32 + (i % 5) * 0.1,
+                    phase: i * 0.55
+                });
+            }
+
+            // =====================================================================
+            // REALM 2: CRYSTAL LOTUS & FLOATING GARDENS (حديقة اللوتس الكريستالية)
+            // =====================================================================
+            const realmLotus = new THREE.Group();
+            realmLotus.visible = false;
+            scene.add(realmLotus);
+
+            // Rippling Energy Pond Rings
+            const waterRings = [];
+            for (let r = 0; r < 5; r++) {
+                const wr = new THREE.Mesh(
+                    new THREE.RingGeometry(1.1 + r * 0.95, 1.15 + r * 0.95, 64),
+                    new THREE.MeshBasicMaterial({ color: 0x34d399, side: THREE.DoubleSide, transparent: true, opacity: 0.35 - r * 0.05 })
+                );
+                wr.rotation.x = -Math.PI / 2;
+                wr.position.y = -1.2;
+                realmLotus.add(wr);
+                waterRings.push({ mesh: wr, baseScale: 1, phase: r * 1.1 });
+            }
+
+            // Procedural Blooming Crystal Lotus Flowers (1 Center Grand + 6 Orbiting)
+            const lotusFlowers = [];
+            const petalShape = new THREE.Shape();
+            petalShape.moveTo(0, 0);
+            petalShape.quadraticCurveTo(0.28, 0.45, 0, 1.15);
+            petalShape.quadraticCurveTo(-0.28, 0.45, 0, 0);
+            const petalGeo = new THREE.ExtrudeGeometry(petalShape, { depth: 0.04, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02 });
+
+            function createLotusFlower(scale, pos, wishIdx) {
+                const flower = new THREE.Group();
+                flower.position.set(...pos);
+                flower.scale.setScalar(scale);
+
+                const coreOrb = new THREE.Mesh(new THREE.OctahedronGeometry(0.28, 1), goldMat);
+                coreOrb.position.y = 0.25;
+                coreOrb.userData = { label: `بتلة أمنية #${wishIdx + 1} 🌸 (انقري للقراءة)`, type: 'lotusWish', wishIdx };
+                interactiveMeshes.push(coreOrb);
+                flower.add(coreOrb);
+
+                const petals = [];
+                // 2 layers of 8 petals each
+                for (let layer = 0; layer < 2; layer++) {
+                    const count = 8;
+                    for (let p = 0; p < count; p++) {
+                        const pivot = new THREE.Group();
+                        pivot.rotation.y = (p / count) * Math.PI * 2 + layer * 0.38;
+                        const pMesh = new THREE.Mesh(petalGeo, layer === 0 ? coreMat : secondaryMat);
+                        pMesh.scale.setScalar(layer === 0 ? 0.85 : 1.08);
+                        pMesh.userData = { label: `زهرة اللوتس الكريستالية 🌸`, type: 'lotusWish', wishIdx };
+                        interactiveMeshes.push(pMesh);
+                        pivot.add(pMesh);
+                        flower.add(pivot);
+                        petals.push({
+                            mesh: pMesh,
+                            closedTilt: layer === 0 ? 0.22 : 0.35,
+                            openTilt: layer === 0 ? 0.72 : 1.05
+                        });
+                    }
+                }
+                realmLotus.add(flower);
+                lotusFlowers.push({ group: flower, coreOrb, petals, baseY: pos[1], openAmount: 0.3, phase: wishIdx * 1.2 });
+            }
+
+            createLotusFlower(1.25, [0, -0.75, 0], 0);
+            for (let i = 0; i < 5; i++) {
+                const ang = (i / 5) * Math.PI * 2 + 0.3;
+                createLotusFlower(0.68, [Math.cos(ang) * 2.85, -0.95 + (i % 2) * 0.25, Math.sin(ang) * 2.2], i + 1);
+            }
+
+            // =====================================================================
+            // REALM 3: CONSTELLATION OBSERVATORY & STAR-NAME (مرصد الأبراج والاسم)
+            // =====================================================================
+            const realmObservatory = new THREE.Group();
+            realmObservatory.visible = false;
+            scene.add(realmObservatory);
+
+            // Giant Rotating Astrolabe Rings
+            const astro1 = new THREE.Mesh(new THREE.TorusGeometry(3.2, 0.032, 16, 120), goldMat);
+            const astro2 = new THREE.Mesh(new THREE.TorusGeometry(2.85, 0.025, 16, 120), secondaryMat);
+            astro2.rotation.x = Math.PI / 3;
+            const astro3 = new THREE.Mesh(new THREE.TorusGeometry(3.55, 0.022, 16, 120), coreMat);
+            astro3.rotation.y = Math.PI / 4;
+            realmObservatory.add(astro1, astro2, astro3);
+
+            // Orbiting Celestial Planets
+            const planet1 = new THREE.Mesh(new THREE.SphereGeometry(0.32, 24, 24), secondaryMat);
+            const planet2 = new THREE.Mesh(new THREE.SphereGeometry(0.24, 24, 24), goldMat);
+            realmObservatory.add(planet1, planet2);
+
+            // Morphing Star-Name Particle Cloud (3,200 Stars spelling WAFAE / وفاء / Heart)
+            const starNameCount = isMobile ? 2200 : 3400;
+            const snCurr = new Float32Array(starNameCount * 3);
+            const snCols = new Float32Array(starNameCount * 3);
+
+            function sampleStarText(text, fontStr, sx = 0.012, sy = 0.014) {
+                const c = document.createElement('canvas');
+                c.width = 640; c.height = 200;
+                const ctx = c.getContext('2d');
+                ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 640, 200);
+                ctx.fillStyle = '#fff'; ctx.font = fontStr;
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(text, 320, 102);
+                const img = ctx.getImageData(0, 0, 640, 200).data;
+                const pts = [];
+                for (let y = 0; y < 200; y += 2) {
+                    for (let x = 0; x < 640; x += 2) {
+                        if (img[(y * 640 + x) * 4] > 128) {
+                            pts.push({ x: (x - 320) * sx, y: (100 - y) * sy });
+                        }
+                    }
+                }
+                const out = new Float32Array(starNameCount * 3);
+                for (let i = 0; i < starNameCount; i++) {
+                    const p = pts[i % Math.max(1, pts.length)] || { x: 0, y: 0 };
+                    out[i * 3] = p.x + (Math.random() - 0.5) * 0.05;
+                    out[i * 3 + 1] = p.y + (Math.random() - 0.5) * 0.05;
+                    out[i * 3 + 2] = (Math.random() - 0.5) * 0.35;
+                }
+                return out;
+            }
+
+            const starTargets = {
+                wafaeEn: sampleStarText('WAFAE', 'bold 115px Georgia, serif'),
+                wafaeAr: sampleStarText('وفاء', 'bold 125px Amiri, serif'),
+                heart: new Float32Array(starNameCount * 3)
+            };
+
+            for (let i = 0; i < starNameCount; i++) {
+                const t = (i / starNameCount) * Math.PI * 2 * 11;
+                starTargets.heart[i * 3] = 16 * Math.pow(Math.sin(t), 3) * 0.125 + (Math.random() - 0.5) * 0.07;
+                starTargets.heart[i * 3 + 1] = (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * 0.125 + 0.2;
+                starTargets.heart[i * 3 + 2] = Math.sin(i * 0.08) * 0.5;
+
+                snCurr[i * 3] = starTargets.wafaeEn[i * 3];
+                snCurr[i * 3 + 1] = starTargets.wafaeEn[i * 3 + 1];
+                snCurr[i * 3 + 2] = starTargets.wafaeEn[i * 3 + 2];
+
+                const col = new THREE.Color().setHSL(0.12 + (i / starNameCount) * 0.45, 0.9, 0.65);
+                snCols[i * 3] = col.r; snCols[i * 3 + 1] = col.g; snCols[i * 3 + 2] = col.b;
+            }
+
+            const snGeo = new THREE.BufferGeometry();
+            snGeo.setAttribute('position', new THREE.BufferAttribute(snCurr, 3));
+            snGeo.setAttribute('color', new THREE.BufferAttribute(snCols, 3));
+            const starNamePoints = new THREE.Points(snGeo, new THREE.PointsMaterial({
+                size: isMobile ? 0.075 : 0.065, vertexColors: true, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending
+            }));
+            realmObservatory.add(starNamePoints);
+
+            // Shooting Stars Pool
+            const shootingComets = [];
+            function launchShootingStar() {
+                const comet = new THREE.Mesh(new THREE.SphereGeometry(0.11, 12, 12), new THREE.MeshBasicMaterial({ color: 0xffe484 }));
+                comet.position.set((Math.random() - 0.5) * 12, 4.5 + Math.random() * 2.5, -2 - Math.random() * 4);
+                const tail = new THREE.Line(
+                    new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(2.2, 1.1, 0.3)]),
+                    new THREE.LineBasicMaterial({ color: 0xffd700, transparent: true, opacity: 0.9 })
+                );
+                comet.add(tail);
+                realmObservatory.add(comet);
+                shootingComets.push({ mesh: comet, vx: -0.24 - Math.random() * 0.1, vy: -0.13 - Math.random() * 0.06, life: 1.0 });
+            }
+
+            // =====================================================================
+            // REALM 4: SYMPHONY OF LIGHT & INTERACTIVE COSMIC HARP (قيثارة النور)
+            // =====================================================================
+            const realmHarp = new THREE.Group();
+            realmHarp.visible = false;
+            scene.add(realmHarp);
+
+            // Sculptural Arch Frame
+            const harpArch = new THREE.Mesh(new THREE.TorusGeometry(3.2, 0.085, 16, 100, Math.PI), goldMat);
+            harpArch.position.y = -0.6;
+            const harpBase = new THREE.Mesh(new THREE.BoxGeometry(6.6, 0.22, 0.45), goldMat);
+            harpBase.position.y = -0.65;
+            realmHarp.add(harpArch, harpBase);
+
+            // 12 Interactive Laser Harp Strings with Spring Vibration Physics
+            const harpStrings = [];
+            const stringCount = 12;
+            for (let s = 0; s < stringCount; s++) {
+                const norm = (s / (stringCount - 1)) * 2 - 1; // -1 to 1
+                const xPos = norm * 2.75;
+                const height = Math.sqrt(Math.max(0.2, 1 - (xPos / 3.15) * (xPos / 3.15))) * 3.1;
+                const yCenter = -0.6 + height / 2;
+
+                const sMat = new THREE.MeshBasicMaterial({
+                    color: s % 2 === 0 ? 0x34d399 : 0xa855f7,
+                    transparent: true,
+                    opacity: 0.85
+                });
+                const sMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, height, 12), sMat);
+                sMesh.position.set(xPos, yCenter, 0);
+                sMesh.userData = { label: `وتر القيثارة #${s + 1} 🎵`, type: 'harpString', stringIdx: s };
+                interactiveMeshes.push(sMesh);
+
+                const topPrism = new THREE.Mesh(new THREE.OctahedronGeometry(0.11, 0), goldMat);
+                topPrism.position.set(xPos, -0.6 + height, 0);
+
+                realmHarp.add(sMesh, topPrism);
+                harpStrings.push({
+                    mesh: sMesh,
+                    prism: topPrism,
+                    baseX: xPos,
+                    vibration: 0,
+                    cooldown: 0,
+                    index: s
+                });
+            }
+
+            // =====================================================================
+            // REALM 5: GALLERY OF FLOATING MONOLITHS & CRYSTAL GIFTS (متحف الهدايا)
+            // =====================================================================
+            const realmGallery = new THREE.Group();
+            realmGallery.visible = false;
+            scene.add(realmGallery);
+
+            // Center Rotating Sacred Polyhedron
+            const centerPoly = new THREE.Mesh(new THREE.IcosahedronGeometry(1.15, 0), crystalGlassMat);
+            const centerWire = new THREE.Mesh(new THREE.IcosahedronGeometry(1.18, 0), new THREE.MeshBasicMaterial({ color: 0xffd700, wireframe: true }));
+            realmGallery.add(centerPoly, centerWire);
+
+            // 6 Floating Glass & Gold Monoliths + Levitating Gift Crystals
+            const galleryMonoliths = [];
+            for (let m = 0; m < 6; m++) {
+                const angle = (m / 6) * Math.PI * 2;
+                const radius = 3.65;
+                const mGroup = new THREE.Group();
+                mGroup.position.set(Math.cos(angle) * radius, 0.15, Math.sin(angle) * radius);
+
+                const slab = new THREE.Mesh(new THREE.BoxGeometry(1.15, 1.75, 0.12), crystalGlassMat);
+                slab.userData = { label: `${MONOLITH_ARTIFACTS[m].title} 💎 (انقري للفتح)`, type: 'monolith', artifactIdx: m };
+                interactiveMeshes.push(slab);
+
+                const frame = new THREE.Mesh(new THREE.BoxGeometry(1.22, 1.82, 0.08), new THREE.MeshBasicMaterial({ color: 0xffd700, wireframe: true }));
+                const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.24, 0), m % 2 === 0 ? coreMat : secondaryMat);
+                gem.position.y = 1.25;
+                gem.userData = { label: `${MONOLITH_ARTIFACTS[m].title} 💎 (انقري للفتح)`, type: 'monolith', artifactIdx: m };
+                interactiveMeshes.push(gem);
+
+                mGroup.add(slab, frame, gem);
+                mGroup.lookAt(0, 0.15, 0);
+                realmGallery.add(mGroup);
+                galleryMonoliths.push({ group: mGroup, gem, baseY: 0.15, angle, radius, phase: m * 1.05 });
+            }
+
+            // =====================================================================
+            // REALM 6: GRAND SUPERNOVA & CELESTIAL BIRTHDAY CAKE (كعكة النجوم)
+            // =====================================================================
+            const realmSupernova = new THREE.Group();
+            realmSupernova.visible = false;
+            realmSupernova.position.y = -0.85;
+            scene.add(realmSupernova);
+
+            // Golden Pedestal & 3 Crystal/Velvet Tiers
+            const cakePlate = new THREE.Mesh(new THREE.CylinderGeometry(2.85, 2.5, 0.18, 64), goldMat);
+            const cTier1 = new THREE.Mesh(new THREE.CylinderGeometry(2.15, 2.15, 1.05, 64), velvetCakeMat);
+            cTier1.position.y = 0.6;
+            const cRing1 = new THREE.Mesh(new THREE.TorusGeometry(2.17, 0.045, 16, 80), goldMat);
+            cRing1.rotation.x = Math.PI / 2; cRing1.position.y = 1.12;
+
+            const cTier2 = new THREE.Mesh(new THREE.CylinderGeometry(1.52, 1.52, 0.95, 64), velvetCakeMat);
+            cTier2.position.y = 1.6;
+            const cRing2 = new THREE.Mesh(new THREE.TorusGeometry(1.54, 0.04, 16, 80), coreMat);
+            cRing2.rotation.x = Math.PI / 2; cRing2.position.y = 2.06;
+
+            const cTier3 = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.82, 64), crystalGlassMat);
+            cTier3.position.y = 2.48;
+            const cRing3 = new THREE.Mesh(new THREE.TorusGeometry(0.97, 0.035, 16, 80), goldMat);
+            cRing3.rotation.x = Math.PI / 2; cRing3.position.y = 2.88;
+
+            cTier1.userData = { label: 'كعكة النجوم الملكية 🎂 (انقري لإطفاء الشموع!)', type: 'cake' };
+            cTier2.userData = { label: 'كعكة النجوم الملكية 🎂 (انقري لإطفاء الشموع!)', type: 'cake' };
+            cTier3.userData = { label: 'كعكة النجوم الملكية 🎂 (انقري لإطفاء الشموع!)', type: 'cake' };
+            interactiveMeshes.push(cTier1, cTier2, cTier3);
+
+            realmSupernova.add(cakePlate, cTier1, cRing1, cTier2, cRing2, cTier3, cRing3);
+
+            // Floating Crown Topper & 9 Candles
+            const cakeTopCrown = new THREE.Mesh(new THREE.OctahedronGeometry(0.32, 0), goldMat);
+            cakeTopCrown.position.y = 3.95;
+            realmSupernova.add(cakeTopCrown);
+
+            const cakeCandles = [];
+            const flameGeo = new THREE.SphereGeometry(0.065, 14, 14);
+            flameGeo.scale(0.75, 1.9, 0.75);
+
+            for (let c = 0; c < 9; c++) {
+                const ang = (c / 9) * Math.PI * 2;
+                const rad = c === 0 ? 0 : 0.62;
+                const h = c === 0 ? 0.78 : 0.58;
+                const cGrp = new THREE.Group();
+                cGrp.position.set(Math.cos(ang) * rad, 2.9, Math.sin(ang) * rad);
+
+                const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, h, 14), goldMat);
+                stick.position.y = h / 2;
+
+                const flame = new THREE.Mesh(flameGeo, new THREE.MeshBasicMaterial({ color: 0xffe066 }));
+                flame.position.y = h + 0.14;
+
+                const halo = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 12), new THREE.MeshBasicMaterial({ color: 0xff8800, transparent: true, opacity: 0.35 }));
+                halo.position.y = h + 0.14;
+
+                cGrp.add(stick, flame, halo);
+                realmSupernova.add(cGrp);
+                cakeCandles.push({ flame, halo, phase: c * 1.1 });
+            }
+
+            // =====================================================================
+            // REALM 7: TEMPLE OF JUSTICE & LAW — CADI AYYAD UNIVERSITY (معبد العدالة)
+            // =====================================================================
+            const realmJustice = new THREE.Group();
+            realmJustice.visible = false;
+            scene.add(realmJustice);
+
+            // Neoclassical-Moroccan Floating Colonnade & Arched Sanctuary
+            const templeBase = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 4.1, 0.22, 64), crystalGlassMat);
+            templeBase.position.y = -1.65;
+            const templeGoldTrim = new THREE.Mesh(new THREE.TorusGeometry(3.85, 0.04, 16, 100), goldMat);
+            templeGoldTrim.rotation.x = Math.PI / 2;
+            templeGoldTrim.position.y = -1.53;
+            realmJustice.add(templeBase, templeGoldTrim);
+
+            // 8 Classical Marble/Crystal Columns & Moorish-inspired Golden Arches
+            for (let colIdx = 0; colIdx < 8; colIdx++) {
+                const ang = (colIdx / 8) * Math.PI * 2;
+                const rad = 3.45;
+                const colMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.14, 3.1, 20), crystalGlassMat);
+                colMesh.position.set(Math.cos(ang) * rad, -0.05, Math.sin(ang) * rad);
+
+                const capGold = new THREE.Mesh(new THREE.CylinderGeometry(0.20, 0.12, 0.16, 20), goldMat);
+                capGold.position.set(Math.cos(ang) * rad, 1.52, Math.sin(ang) * rad);
+
+                const archBridge = new THREE.Mesh(new THREE.TorusGeometry(1.32, 0.035, 12, 48, Math.PI), goldMat);
+                const nextAng = ((colIdx + 1) / 8) * Math.PI * 2;
+                archBridge.position.set(
+                    ((Math.cos(ang) + Math.cos(nextAng)) * 0.5) * rad,
+                    1.55,
+                    ((Math.sin(ang) + Math.sin(nextAng)) * 0.5) * rad
+                );
+                archBridge.lookAt(0, 1.55, 0);
+
+                realmJustice.add(colMesh, capGold, archBridge);
+            }
+
+            // Monumental 3D Golden Scales of Justice (ميزان العدالة الملكي)
+            const scalesMonument = new THREE.Group();
+            scalesMonument.position.set(0, -0.1, 0);
+
+            const scalePedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 1.15, 0.25, 48), goldMat);
+            scalePedestal.position.y = -1.42;
+            const scalePillar = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.14, 3.0, 32), goldMat);
+            scalePillar.position.y = 0.08;
+            const scaleCrownGem = new THREE.Mesh(new THREE.OctahedronGeometry(0.24, 0), coreMat);
+            scaleCrownGem.position.y = 1.72;
+            scalesMonument.add(scalePedestal, scalePillar, scaleCrownGem);
+
+            const justiceBeamPivot = new THREE.Group();
+            justiceBeamPivot.position.y = 1.42;
+            const justiceCrossbeam = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 3.4, 24), goldMat);
+            justiceCrossbeam.rotation.z = Math.PI / 2;
+            justiceBeamPivot.add(justiceCrossbeam);
+
+            // Left Pan (الحق - Truth)
+            const leftScalePan = new THREE.Group();
+            leftScalePan.position.set(-1.6, -1.25, 0);
+            const lDish = new THREE.Mesh(new THREE.CylinderGeometry(0.66, 0.42, 0.12, 32), coreMat);
+            const lOrb = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 24), goldMat);
+            lOrb.position.y = 0.2;
+            const lChain = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 1.25, 12), goldMat);
+            lChain.position.y = 0.62;
+            leftScalePan.add(lDish, lOrb, lChain);
+
+            // Right Pan (الحكمة - Wisdom)
+            const rightScalePan = new THREE.Group();
+            rightScalePan.position.set(1.6, -1.25, 0);
+            const rDish = new THREE.Mesh(new THREE.CylinderGeometry(0.66, 0.42, 0.12, 32), secondaryMat);
+            const rOrb = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 24), goldMat);
+            rOrb.position.y = 0.2;
+            const rChain = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 1.25, 12), goldMat);
+            rChain.position.y = 0.62;
+            rightScalePan.add(rDish, rOrb, rChain);
+
+            justiceBeamPivot.add(leftScalePan, rightScalePan);
+            scalesMonument.add(justiceBeamPivot);
+            realmJustice.add(scalesMonument);
+
+            // Interactive 3D Judge's Gavel & Sound Block + Open Law Codex Book
+            const gavelAssembly = new THREE.Group();
+            gavelAssembly.position.set(1.85, -1.1, 1.25);
+
+            const soundBlockMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.54, 0.14, 32), goldMat);
+            soundBlockMesh.userData = { label: 'مطرقة العدالة الذهبية ⚖️ (انقري لدقّ المطرقة)', type: 'gavelStrike' };
+            interactiveMeshes.push(soundBlockMesh);
+
+            const gavelArmPivot = new THREE.Group();
+            gavelArmPivot.position.set(0.48, 0.42, 0);
+            const gavelHandleMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.06, 1.15, 20), goldMat);
+            gavelHandleMesh.rotation.z = Math.PI / 2;
+            gavelHandleMesh.position.x = -0.35;
+            const gavelHeadMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.56, 28), secondaryMat);
+            gavelHeadMesh.position.x = -0.82;
+            gavelHeadMesh.userData = { label: 'مطرقة العدالة الذهبية ⚖️ (انقري لدقّ المطرقة)', type: 'gavelStrike' };
+            interactiveMeshes.push(gavelHeadMesh);
+
+            gavelArmPivot.add(gavelHandleMesh, gavelHeadMesh);
+            gavelAssembly.add(soundBlockMesh, gavelArmPivot);
+            realmJustice.add(gavelAssembly);
+
+            // Open Luminous Law Codex / Constitution Book (دستور التميز)
+            const codexGroup = new THREE.Group();
+            codexGroup.position.set(-1.85, -0.95, 1.25);
+            codexGroup.rotation.set(0.35, 0.35, 0);
+            const leftPage = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.04, 1.15), crystalGlassMat);
+            leftPage.position.set(-0.42, 0.04, 0);
+            leftPage.rotation.z = 0.18;
+            const rightPage = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.04, 1.15), crystalGlassMat);
+            rightPage.position.set(0.42, 0.04, 0);
+            rightPage.rotation.z = -0.18;
+            const bookCover = new THREE.Mesh(new THREE.BoxGeometry(1.78, 0.05, 1.22), goldMat);
+            codexGroup.add(bookCover, leftPage, rightPage);
+            realmJustice.add(codexGroup);
+
+            // 6 Orbiting Legal Excellence Medallions (أركان التميز القانوني - القاضي عياض)
+            const justiceMedallions = [];
+            for (let j = 0; j < 6; j++) {
+                const ang = (j / 6) * Math.PI * 2;
+                const medGroup = new THREE.Group();
+                const medRing = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.035, 14, 48), goldMat);
+                const medCore = new THREE.Mesh(new THREE.OctahedronGeometry(0.24, 0), j % 2 === 0 ? coreMat : secondaryMat);
+                medCore.userData = {
+                    label: `${JUSTICE_PILLARS[j].title} ⚖️ (انقري للقراءة)`,
+                    type: 'justicePillar',
+                    pillarIdx: j
+                };
+                interactiveMeshes.push(medCore);
+                medGroup.add(medRing, medCore);
+                realmJustice.add(medGroup);
+                justiceMedallions.push({
+                    group: medGroup,
+                    core: medCore,
+                    angle: ang,
+                    radius: 2.75,
+                    phase: j * 1.05
+                });
+            }
+
+            // =====================================================================
+            // REALM 8: SANCTUARY OF POETIC WORDS & CELESTIAL WINGS (سماء القصائد)
+            // =====================================================================
+            const realmPoems = new THREE.Group();
+            realmPoems.visible = false;
+            scene.add(realmPoems);
+
+            // Central Heart-Tree of Light & Intertwined Golden Spiral Trunk
+            const treeCore = new THREE.Mesh(heartGeo, secondaryMat);
+            treeCore.position.y = 0.45;
+            treeCore.scale.set(1.45, 1.45, 1.45);
+            treeCore.userData = { label: 'قلب القصائد الخالدة 💖 (انقري لرسالة جديدة)', type: 'poemLantern', poemIdx: 0 };
+            interactiveMeshes.push(treeCore);
+            realmPoems.add(treeCore);
+
+            // Symmetrical Celestial Crystal Wings (Left & Right Feathered Wings)
+            const leftWingGroup = new THREE.Group();
+            leftWingGroup.position.set(-0.35, 0.45, -0.2);
+            const rightWingGroup = new THREE.Group();
+            rightWingGroup.position.set(0.35, 0.45, -0.2);
+
+            const featherShape = new THREE.Shape();
+            featherShape.moveTo(0, 0);
+            featherShape.quadraticCurveTo(0.18, 0.75, 0, 1.65);
+            featherShape.quadraticCurveTo(-0.18, 0.75, 0, 0);
+            const featherGeo = new THREE.ExtrudeGeometry(featherShape, { depth: 0.03, bevelEnabled: true, bevelSize: 0.015, bevelThickness: 0.015 });
+
+            for (let f = 0; f < 9; f++) {
+                const spreadAngle = 0.25 + f * 0.16;
+                const scaleLen = 1.35 - f * 0.08;
+
+                const lFeather = new THREE.Mesh(featherGeo, f % 2 === 0 ? coreMat : crystalGlassMat);
+                lFeather.rotation.z = spreadAngle;
+                lFeather.scale.set(0.85, scaleLen, 1);
+                leftWingGroup.add(lFeather);
+
+                const rFeather = new THREE.Mesh(featherGeo, f % 2 === 0 ? coreMat : crystalGlassMat);
+                rFeather.rotation.z = -spreadAngle;
+                rFeather.scale.set(0.85, scaleLen, 1);
+                rightWingGroup.add(rFeather);
+            }
+            realmPoems.add(leftWingGroup, rightWingGroup);
+
+            // 12 Orbiting Luminous Lanterns of Praise (قناديل الثناء المضيئة)
+            const poemLanterns = [];
+            for (let l = 0; l < 12; l++) {
+                const ang = (l / 12) * Math.PI * 2;
+                const lGroup = new THREE.Group();
+
+                const lanternGlass = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.16, 0.44, 16), crystalGlassMat);
+                const lanternCapTop = new THREE.Mesh(new THREE.ConeGeometry(0.25, 0.18, 16), goldMat);
+                lanternCapTop.position.y = 0.30;
+                const lanternCapBot = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.10, 0.10, 16), goldMat);
+                lanternCapBot.position.y = -0.26;
+                const lanternFlame = new THREE.Mesh(new THREE.OctahedronGeometry(0.11, 0), goldMat);
+
+                const pIdx = l % POETIC_TRIBUTES.length;
+                lanternGlass.userData = {
+                    label: `${POETIC_TRIBUTES[pIdx].title} 🏮 (انقري للقراءة)`,
+                    type: 'poemLantern',
+                    poemIdx: pIdx
+                };
+                interactiveMeshes.push(lanternGlass);
+
+                lGroup.add(lanternGlass, lanternCapTop, lanternCapBot, lanternFlame);
+                realmPoems.add(lGroup);
+                poemLanterns.push({
+                    group: lGroup,
+                    flame: lanternFlame,
+                    angle: ang,
+                    radius: 2.9 + (l % 2) * 0.55,
+                    baseY: -0.4 + (l % 3) * 0.75,
+                    phase: l * 0.85
+                });
+            }
+
+            // Falling 3D Golden Rose Petals in Realm 8
+            const poemPetals = [];
+            const rosePetalGeo = new THREE.CircleGeometry(0.14, 6);
+            for (let p = 0; p < 55; p++) {
+                const pm = new THREE.Mesh(rosePetalGeo, p % 2 === 0 ? goldMat : secondaryMat);
+                pm.position.set((Math.random() - 0.5) * 10, (Math.random() - 0.2) * 8, (Math.random() - 0.5) * 8);
+                realmPoems.add(pm);
+                poemPetals.push({
+                    mesh: pm,
+                    fall: 0.008 + Math.random() * 0.012,
+                    sway: 0.8 + Math.random() * 1.2,
+                    phase: Math.random() * 6.28
+                });
+            }
+
+            // --- GLOBAL AMBIENT STARFIELD & 3D SHOCKWAVES ---
+            const globalStarCount = isMobile ? 1200 : 2200;
+            const gPos = new Float32Array(globalStarCount * 3);
+            const gBase = new Float32Array(globalStarCount * 3);
+            for (let i = 0; i < globalStarCount; i++) {
+                const r = 4.5 + Math.random() * 18;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                gPos[i * 3] = gBase[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+                gPos[i * 3 + 1] = gBase[i * 3 + 1] = r * Math.cos(phi) * 0.75;
+                gPos[i * 3 + 2] = gBase[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
+            }
+            const globalStarGeo = new THREE.BufferGeometry();
+            globalStarGeo.setAttribute('position', new THREE.BufferAttribute(gPos, 3));
+            const globalStarMat = new THREE.PointsMaterial({
+                size: isMobile ? 0.08 : 0.07, color: 0x34d399, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending
+            });
+            const globalStarField = new THREE.Points(globalStarGeo, globalStarMat);
+            scene.add(globalStarField);
+
+            const activeShockwaves = [];
+            function spawn3DShockwave(worldPoint, hexColor) {
+                const swMesh = new THREE.Mesh(
+                    new THREE.RingGeometry(0.15, 0.32, 48),
+                    new THREE.MeshBasicMaterial({ color: hexColor, side: THREE.DoubleSide, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending })
+                );
+                swMesh.position.copy(worldPoint);
+                swMesh.lookAt(camera.position);
+                scene.add(swMesh);
+                activeShockwaves.push({ mesh: swMesh, life: 1.0 });
+            }
+
+            // =====================================================================
+            // POINTER, RAYCASTING, HARP STRUMMING & SPRING-DAMPER CAMERA CONTROLS
+            // =====================================================================
+            const raycaster = new THREE.Raycaster();
+            const pointerNDC = new THREE.Vector2(0, 0);
+            const interactionPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+            const pointerWorld = new THREE.Vector3(0, 0, 0);
+            const tooltipEl = document.getElementById('world-tooltip');
+            const tooltipTextEl = document.getElementById('tooltip-text');
+
+            let isPointerDown = false;
+            let downX = 0, downY = 0, prevX = 0, prevY = 0;
+            let rotY = 0, rotX = 0, velRotY = 0, velRotX = 0;
+            let targetTiltX = 0, targetTiltY = 0;
+            let hoveredObj = null;
+
+            function handlePointerMove(clientX, clientY) {
+                pointerNDC.x = (clientX / window.innerWidth) * 2 - 1;
+                pointerNDC.y = -(clientY / window.innerHeight) * 2 + 1;
+                targetTiltY = pointerNDC.x * 0.42;
+                targetTiltX = -pointerNDC.y * 0.32;
+
+                raycaster.setFromCamera(pointerNDC, camera);
+                raycaster.ray.intersectPlane(interactionPlane, pointerWorld);
+
+                // Raycast against visible interactive 3D meshes
+                const visibleTargets = interactiveMeshes.filter((m) => {
+                    let p = m;
+                    while (p.parent) {
+                        if (!p.visible) return false;
+                        p = p.parent;
+                    }
+                    return true;
+                });
+
+                const hits = raycaster.intersectObjects(visibleTargets, false);
+                if (hits.length > 0) {
+                    const hit = hits[0].object;
+                    hoveredObj = hit;
+                    if (tooltipEl && tooltipTextEl && hit.userData.label) {
+                        tooltipTextEl.textContent = hit.userData.label;
+                        tooltipEl.style.left = `${clientX}px`;
+                        tooltipEl.style.top = `${clientY}px`;
+                        tooltipEl.classList.add('visible');
+                    }
+
+                    // Realm 4: Auto-strum Cosmic Harp Strings on hover/swipe!
+                    if (hit.userData.type === 'harpString') {
+                        const sData = harpStrings[hit.userData.stringIdx];
+                        if (sData && sData.cooldown <= 0) {
+                            sData.vibration = 0.28;
+                            sData.cooldown = 14;
+                            if (!AppState.audioEnabled) soundEngine.ensureContext();
+                            soundEngine.playHarpString(sData.index, true);
+                            stardust2D.spawnBurst(clientX, clientY, 14, false);
+                        }
+                    }
+                } else {
+                    hoveredObj = null;
+                    if (tooltipEl) tooltipEl.classList.remove('visible');
+                }
+            }
+
+            function handlePointerClick(clientX, clientY) {
+                handlePointerMove(clientX, clientY);
+                const theme = THEMES[AppState.themeKey];
+                spawn3DShockwave(pointerWorld, theme.primaryHex);
+                stardust2D.spawnBurst(clientX, clientY, 30, false);
+                AppState.shockwaveEnergy = 1.0;
+
+                if (hoveredObj && hoveredObj.userData) {
+                    const u = hoveredObj.userData;
+                    if (u.type === 'lotusWish') {
+                        openCosmicModal(
+                            'fa-spa',
+                            'PETALE DE CRISTAL • زهرة اللوتس',
+                            'أمنية من حديقة اللوتس الكريستالية',
+                            LOTUS_WISHES[u.wishIdx % LOTUS_WISHES.length]
+                        );
+                        soundEngine.playSupernovaChord();
+                        return;
+                    }
+                    if (u.type === 'monolith') {
+                        const art = MONOLITH_ARTIFACTS[u.artifactIdx % MONOLITH_ARTIFACTS.length];
+                        openCosmicModal(art.icon, art.tag, art.title, art.body);
+                        soundEngine.playSupernovaChord();
+                        return;
+                    }
+                    if (u.type === 'cake') {
+                        toggleCandlesState();
+                        return;
+                    }
+                    if (u.type === 'gavelStrike') {
+                        triggerJusticeGavelStrike();
+                        return;
+                    }
+                    if (u.type === 'justicePillar') {
+                        const pil = JUSTICE_PILLARS[u.pillarIdx % JUSTICE_PILLARS.length];
+                        openCosmicModal(pil.icon, pil.tag, pil.title, pil.body);
+                        soundEngine.playSupernovaChord();
+                        return;
+                    }
+                    if (u.type === 'poemLantern') {
+                        revealPoeticTribute(u.poemIdx);
+                        return;
+                    }
+                    if (u.type === 'harpString') {
+                        const sData = harpStrings[u.stringIdx];
+                        if (sData) {
+                            sData.vibration = 0.35;
+                            soundEngine.playHarpString(sData.index, true);
+                        }
+                        return;
+                    }
+                }
+
+                if (REALMS[AppState.realmIdx].id === 'observatory') {
+                    launchShootingStar();
+                }
+                soundEngine.playChime();
+            }
+
+            // Mouse Events
+            canvas.addEventListener('mousedown', (e) => {
+                isPointerDown = true;
+                downX = prevX = e.clientX;
+                downY = prevY = e.clientY;
+                handlePointerMove(e.clientX, e.clientY);
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                handlePointerMove(e.clientX, e.clientY);
+                stardust2D.spawnTrail(e.clientX, e.clientY, 2);
+                if (isPointerDown) {
+                    const dx = e.clientX - prevX;
+                    const dy = e.clientY - prevY;
+                    velRotY = dx * 0.007;
+                    velRotX = dy * 0.005;
+                    rotY += velRotY;
+                    rotX = Math.max(-0.65, Math.min(0.65, rotX + velRotX));
+                    prevX = e.clientX;
+                    prevY = e.clientY;
+                }
+            }, { passive: true });
+
+            window.addEventListener('mouseup', (e) => {
+                if (isPointerDown && Math.hypot(e.clientX - downX, e.clientY - downY) < 8) {
+                    handlePointerClick(e.clientX, e.clientY);
+                }
+                isPointerDown = false;
+            });
+
+            // Touch Events
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length > 0) {
+                    const t = e.touches[0];
+                    isPointerDown = true;
+                    downX = prevX = t.clientX;
+                    downY = prevY = t.clientY;
+                    handlePointerMove(t.clientX, t.clientY);
+                    stardust2D.spawnTrail(t.clientX, t.clientY, 4);
+                }
+            }, { passive: true });
+
+            canvas.addEventListener('touchmove', (e) => {
+                if (e.touches.length > 0) {
+                    const t = e.touches[0];
+                    handlePointerMove(t.clientX, t.clientY);
+                    stardust2D.spawnTrail(t.clientX, t.clientY, 2);
+                    if (isPointerDown) {
+                        const dx = t.clientX - prevX;
+                        const dy = t.clientY - prevY;
+                        velRotY = dx * 0.008;
+                        velRotX = dy * 0.006;
+                        rotY += velRotY;
+                        rotX = Math.max(-0.65, Math.min(0.65, rotX + velRotX));
+                        prevX = t.clientX;
+                        prevY = t.clientY;
+                    }
+                }
+            }, { passive: true });
+
+            canvas.addEventListener('touchend', (e) => {
+                if (isPointerDown && e.changedTouches.length > 0) {
+                    const t = e.changedTouches[0];
+                    if (Math.hypot(t.clientX - downX, t.clientY - downY) < 12) {
+                        handlePointerClick(t.clientX, t.clientY);
+                    }
+                }
+                isPointerDown = false;
+                if (tooltipEl) tooltipEl.classList.remove('visible');
+            });
+
+            window.addEventListener('resize', () => {
+                const mobile = window.innerWidth < 768;
+                camera.fov = mobile ? 62 : 52;
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+            });
+
+            // Global Helpers exposed to UI
+            window.triggerCosmicShockwave = (isSupernova = false) => {
+                const theme = THEMES[AppState.themeKey];
+                spawn3DShockwave(new THREE.Vector3(0, 0, 0), theme.primaryHex);
+                if (isSupernova) {
+                    setTimeout(() => spawn3DShockwave(new THREE.Vector3(0, 0.8, 0), theme.secondaryHex), 160);
+                    setTimeout(() => spawn3DShockwave(new THREE.Vector3(0, -0.4, 0), 0xffd700), 320);
+                    AppState.celebrationBoost = 1.6;
+                }
+                AppState.shockwaveEnergy = 1.25;
+                stardust2D.spawnBurst(window.innerWidth / 2, window.innerHeight / 2, isSupernova ? 110 : 45, isSupernova);
+            };
+
+            window.launchObservatoryComet = () => {
+                launchShootingStar();
+                launchShootingStar();
+                soundEngine.playChime(1046.50, 1.0, 0.14);
+            };
+
+            window.strumAllHarpStrings = () => {
+                if (!AppState.audioEnabled) soundEngine.ensureContext();
+                harpStrings.forEach((s, idx) => {
+                    setTimeout(() => {
+                        s.vibration = 0.34;
+                        soundEngine.playHarpString(idx, true);
+                    }, idx * 70);
+                });
+            };
+
+            window.resetCameraView = () => {
+                rotY = 0; rotX = 0; velRotY = 0; velRotX = 0;
+            };
+
+            window.triggerJusticeGavelStrike = () => {
+                AppState.gavelStrikeEnergy = 1.0;
+                AppState.scalesBalanceBias = 0;
+                soundEngine.playGavelStrikeSound();
+                window.triggerCosmicShockwave(true);
+                const randomPillar = JUSTICE_PILLARS[Math.floor(Math.random() * JUSTICE_PILLARS.length)];
+                const quoteEl = document.getElementById('dynamic-quote');
+                if (quoteEl) {
+                    quoteEl.classList.remove('poem-reveal');
+                    void quoteEl.offsetWidth;
+                    quoteEl.classList.add('poem-reveal');
+                    quoteEl.textContent = `⚖️ ${randomPillar.title}: ${randomPillar.body}`;
+                }
+            };
+
+            window.revealPoeticTribute = (specificIdx = null) => {
+                const idx = specificIdx !== null ? specificIdx : AppState.poemIndex;
+                AppState.poemIndex = (idx + 1) % POETIC_TRIBUTES.length;
+                AppState.wingFlutterBoost = 1.0;
+                const tribute = POETIC_TRIBUTES[idx % POETIC_TRIBUTES.length];
+                soundEngine.playSupernovaChord();
+                window.triggerCosmicShockwave(false);
+                openCosmicModal('fa-feather-pointed', tribute.tag, tribute.title, tribute.text);
+            };
+
+            // =====================================================================
+            // MAIN 60FPS ANIMATION LOOP
+            // =====================================================================
+            const clock = new THREE.Clock();
+            const camTargetVec = new THREE.Vector3(0, 0, 0);
+
+            function animate() {
+                requestAnimationFrame(animate);
+                const t = clock.getElapsedTime();
+
+                AppState.shockwaveEnergy *= 0.93;
+                AppState.celebrationBoost *= 0.94;
+                AppState.audioPulse *= 0.92;
+                AppState.gavelStrikeEnergy *= 0.90;
+                AppState.wingFlutterBoost *= 0.92;
+                const totalPulse = AppState.shockwaveEnergy + AppState.celebrationBoost + AppState.audioPulse;
+
+                // Interpolate Theme Colors
+                const theme = THEMES[AppState.themeKey];
+                coreMat.color.lerp(new THREE.Color(theme.primaryHex), 0.06);
+                secondaryMat.color.lerp(new THREE.Color(theme.secondaryHex), 0.06);
+                globalStarMat.color.lerp(new THREE.Color(theme.primaryHex), 0.06);
+                primaryLight.color.lerp(new THREE.Color(theme.primaryHex), 0.06);
+                secondaryLight.color.lerp(new THREE.Color(theme.secondaryHex), 0.06);
+                scene.fog.color.lerp(new THREE.Color(theme.bgHex), 0.06);
+
+                skyUniforms.uTime.value = t;
+                skyUniforms.uEnergy.value = totalPulse;
+                skyUniforms.uColorA.value.lerp(new THREE.Color(...theme.skyA), 0.05);
+                skyUniforms.uColorB.value.lerp(new THREE.Color(...theme.skyB), 0.05);
+                skyUniforms.uColorC.value.lerp(new THREE.Color(...theme.skyC), 0.05);
+
+                // Spring-damper inertia
+                if (!isPointerDown) {
+                    velRotY *= 0.92;
+                    velRotX *= 0.92;
+                    rotY += velRotY + (AppState.autoOrbit ? 0.0042 : 0);
+                    rotX += velRotX;
+                }
+
+                const activeRealmId = REALMS[AppState.realmIdx].id;
+                realmThrone.visible = (activeRealmId === 'throne');
+                realmLotus.visible = (activeRealmId === 'lotus');
+                realmObservatory.visible = (activeRealmId === 'observatory');
+                realmHarp.visible = (activeRealmId === 'harp');
+                realmGallery.visible = (activeRealmId === 'gallery');
+                realmSupernova.visible = (activeRealmId === 'supernova');
+                realmJustice.visible = (activeRealmId === 'justice');
+                realmPoems.visible = (activeRealmId === 'poems');
+
+                // --- ANIMATE REALM 1: THRONE OF LIGHT ---
+                if (realmThrone.visible) {
+                    realmThrone.rotation.y += ((rotY + targetTiltY) - realmThrone.rotation.y) * 0.08;
+                    realmThrone.rotation.x += ((rotX + targetTiltX) - realmThrone.rotation.x) * 0.08;
+                    const hb = 1.75 + Math.pow(Math.sin(t * 3.1), 8) * 0.22 + totalPulse * 0.28;
+                    heartMesh.scale.set(hb, hb, hb);
+                    crownGroup.rotation.y = t * 0.75;
+                    crownGroup.position.y = 1.55 + Math.sin(t * 2.4) * 0.08 + totalPulse * 0.15;
+                    const tilt = Math.sin(t * 1.5) * 0.12 + pointerNDC.x * 0.28;
+                    balancePivot.rotation.z += (tilt - balancePivot.rotation.z) * 0.1;
+                    tRing1.rotation.z = t * 0.45; tRing2.rotation.x = -t * 0.38; tRing3.rotation.y = t * 0.32;
+
+                    const localP = realmThrone.worldToLocal(pointerWorld.clone());
+                    throneGems.forEach((g) => {
+                        g.angle += g.speed * 0.014 * (1 + totalPulse * 0.7);
+                        const gx = Math.cos(g.angle) * g.radius;
+                        const gz = Math.sin(g.angle) * g.radius;
+                        const gy = Math.sin(t * 2.1 + g.phase) * 0.45;
+                        const sc = Math.hypot(gx - localP.x, gy - localP.y) < 1.35 ? 1.85 : (1.0 + totalPulse * 0.25);
+                        g.mesh.position.set(gx, gy, gz);
+                        g.mesh.scale.lerp(new THREE.Vector3(sc, sc, sc), 0.15);
+                        g.mesh.rotation.y += 0.04;
+                    });
+                }
+
+                // --- ANIMATE REALM 2: CRYSTAL LOTUS GARDENS ---
+                if (realmLotus.visible) {
+                    realmLotus.rotation.y += ((rotY * 0.6 + targetTiltY * 0.7) - realmLotus.rotation.y) * 0.07;
+                    waterRings.forEach((wr) => {
+                        const s = 1 + Math.sin(t * 1.8 + wr.phase) * 0.08 + totalPulse * 0.12;
+                        wr.mesh.scale.set(s, s, 1);
+                    });
+
+                    const localP = realmLotus.worldToLocal(pointerWorld.clone());
+                    lotusFlowers.forEach((fl) => {
+                        fl.group.position.y = fl.baseY + Math.sin(t * 1.7 + fl.phase) * 0.12;
+                        fl.group.rotation.y = t * 0.25 + fl.phase;
+                        fl.coreOrb.rotation.y = -t * 1.2;
+
+                        const dist = Math.hypot(fl.group.position.x - localP.x, fl.group.position.y - localP.y);
+                        const targetOpen = dist < 2.2 ? 1.0 : (0.28 + Math.sin(t * 1.2 + fl.phase) * 0.12 + totalPulse * 0.35);
+                        fl.openAmount += (targetOpen - fl.openAmount) * 0.08;
+
+                        fl.petals.forEach((pt) => {
+                            pt.mesh.rotation.x = pt.closedTilt + (pt.openTilt - pt.closedTilt) * fl.openAmount;
+                        });
+                    });
+                }
+
+                // --- ANIMATE REALM 3: CONSTELLATION OBSERVATORY ---
+                if (realmObservatory.visible) {
+                    realmObservatory.rotation.y += ((targetTiltY * 0.65) - realmObservatory.rotation.y) * 0.07;
+                    realmObservatory.rotation.x += ((targetTiltX * 0.45) - realmObservatory.rotation.x) * 0.07;
+                    astro1.rotation.z = t * 0.22;
+                    astro2.rotation.y = -t * 0.28;
+                    astro3.rotation.x = t * 0.18;
+
+                    planet1.position.set(Math.cos(t * 0.7) * 3.2, Math.sin(t * 0.7) * 3.2, 0);
+                    planet2.position.set(Math.cos(-t * 0.9) * 2.85, 0, Math.sin(-t * 0.9) * 2.85);
+
+                    const tArr = starTargets[AppState.starShapeMode] || starTargets.wafaeEn;
+                    const pArr = snGeo.attributes.position.array;
+                    const localP = realmObservatory.worldToLocal(pointerWorld.clone());
+
+                    for (let i = 0; i < starNameCount; i++) {
+                        const ix = i * 3, iy = i * 3 + 1, iz = i * 3 + 2;
+                        pArr[ix] += (tArr[ix] - pArr[ix]) * 0.08;
+                        pArr[iy] += (tArr[iy] - pArr[iy]) * 0.08;
+                        pArr[iz] += (tArr[iz] - pArr[iz]) * 0.08;
+
+                        const dx = pArr[ix] - localP.x;
+                        const dy = pArr[iy] - localP.y;
+                        const d = Math.hypot(dx, dy);
+                        if (d < 1.1 && d > 0.001) {
+                            const f = (1.1 - d) * 0.18;
+                            pArr[ix] += (dx / d) * f;
+                            pArr[iy] += (dy / d) * f;
+                        }
+                    }
+                    snGeo.attributes.position.needsUpdate = true;
+
+                    for (let c = shootingComets.length - 1; c >= 0; c--) {
+                        const cm = shootingComets[c];
+                        cm.life -= 0.022;
+                        cm.mesh.position.x += cm.vx;
+                        cm.mesh.position.y += cm.vy;
+                        if (cm.life <= 0) {
+                            realmObservatory.remove(cm.mesh);
+                            shootingComets.splice(c, 1);
+                        }
+                    }
+                }
+
+                // --- ANIMATE REALM 4: INTERACTIVE COSMIC HARP ---
+                if (realmHarp.visible) {
+                    realmHarp.rotation.y += ((targetTiltY * 0.55) - realmHarp.rotation.y) * 0.08;
+                    harpStrings.forEach((s) => {
+                        if (s.cooldown > 0) s.cooldown--;
+                        if (s.vibration > 0.001) {
+                            s.mesh.position.x = s.baseX + Math.sin(t * 58 + s.index) * s.vibration;
+                            s.vibration *= 0.91;
+                        } else {
+                            s.mesh.position.x = s.baseX;
+                        }
+                        s.prism.rotation.y = t * 1.5 + s.index;
+                    });
+                }
+
+                // --- ANIMATE REALM 5: GALLERY OF FLOATING MONOLITHS ---
+                if (realmGallery.visible) {
+                    realmGallery.rotation.y += ((rotY + targetTiltY * 0.5) - realmGallery.rotation.y) * 0.06;
+                    centerPoly.rotation.y = t * 0.5;
+                    centerPoly.rotation.x = t * 0.3;
+                    centerWire.rotation.y = -t * 0.4;
+
+                    galleryMonoliths.forEach((m) => {
+                        m.group.position.y = m.baseY + Math.sin(t * 1.8 + m.phase) * 0.18;
+                        m.gem.rotation.y = t * 1.6;
+                    });
+                }
+
+                // --- ANIMATE REALM 6: SUPERNOVA & CELESTIAL CAKE ---
+                if (realmSupernova.visible) {
+                    realmSupernova.rotation.y += ((rotY + targetTiltY * 0.6) - realmSupernova.rotation.y) * 0.08;
+                    cakeTopCrown.rotation.y = t * 1.4;
+                    cakeTopCrown.position.y = 3.95 + Math.sin(t * 2.5) * 0.12 + totalPulse * 0.18;
+
+                    cakeCandles.forEach((c) => {
+                        c.flame.visible = AppState.candlesLit;
+                        c.halo.visible = AppState.candlesLit;
+                        if (AppState.candlesLit) {
+                            const flk = 1 + Math.sin(t * 20 + c.phase) * 0.16 + totalPulse * 0.25;
+                            c.flame.scale.set(0.75 * flk, 1.9 * flk, 0.75 * flk);
+                        }
+                    });
+                }
+
+                // --- ANIMATE REALM 7: TEMPLE OF JUSTICE & LAW (CADI AYYAD UNIVERSITY) ---
+                if (realmJustice.visible) {
+                    realmJustice.rotation.y += ((rotY * 0.45 + targetTiltY * 0.55) - realmJustice.rotation.y) * 0.07;
+
+                    // Spring-physics Scales of Justice reacting to mouse/touch & gavel strikes
+                    const targetScaleTilt = AppState.gavelStrikeEnergy > 0.15
+                        ? 0
+                        : (Math.sin(t * 1.4) * 0.11 + pointerNDC.x * 0.26);
+                    justiceBeamPivot.rotation.z += (targetScaleTilt - justiceBeamPivot.rotation.z) * 0.09;
+                    leftScalePan.rotation.z = -justiceBeamPivot.rotation.z;
+                    rightScalePan.rotation.z = -justiceBeamPivot.rotation.z;
+
+                    scaleCrownGem.rotation.y = t * 1.3;
+                    scaleCrownGem.position.y = 1.72 + Math.sin(t * 2.4) * 0.07 + totalPulse * 0.15;
+
+                    // Gavel Strike Animation
+                    const strikeAngle = AppState.gavelStrikeEnergy > 0.05
+                        ? -Math.sin(AppState.gavelStrikeEnergy * Math.PI) * 0.55
+                        : (0.28 + Math.sin(t * 2.0) * 0.06);
+                    gavelArmPivot.rotation.z = strikeAngle;
+
+                    // Codex gentle hover
+                    codexGroup.position.y = -0.95 + Math.sin(t * 2.1) * 0.06;
+
+                    // 6 Orbiting Legal Excellence Medallions
+                    const localP = realmJustice.worldToLocal(pointerWorld.clone());
+                    justiceMedallions.forEach((med) => {
+                        med.angle += 0.008 * (1 + totalPulse * 0.5);
+                        const mx = Math.cos(med.angle) * med.radius;
+                        const mz = Math.sin(med.angle) * med.radius;
+                        const my = 0.55 + Math.sin(t * 1.9 + med.phase) * 0.28;
+                        med.group.position.set(mx, my, mz);
+                        med.group.lookAt(camera.position);
+
+                        const hoverBoost = Math.hypot(mx - localP.x, my - localP.y) < 1.25 ? 1.45 : 1.0;
+                        med.group.scale.lerp(new THREE.Vector3(hoverBoost, hoverBoost, hoverBoost), 0.15);
+                    });
+                }
+
+                // --- ANIMATE REALM 8: SANCTUARY OF POETIC WORDS & CELESTIAL WINGS ---
+                if (realmPoems.visible) {
+                    realmPoems.rotation.y += ((rotY * 0.4 + targetTiltY * 0.5) - realmPoems.rotation.y) * 0.07;
+
+                    const heartPulse = 1.45 + Math.pow(Math.sin(t * 3.0), 8) * 0.2 + totalPulse * 0.22;
+                    treeCore.scale.set(heartPulse, heartPulse, heartPulse);
+
+                    // Graceful Crystal Wing Flap reacting to pointer movement & tribute reveals
+                    const flap = Math.sin(t * 2.2) * 0.16 + Math.abs(pointerNDC.x) * 0.22 + AppState.wingFlutterBoost * 0.38;
+                    leftWingGroup.rotation.y = flap;
+                    rightWingGroup.rotation.y = -flap;
+
+                    // 12 Orbiting Luminous Lanterns of Praise
+                    const localP = realmPoems.worldToLocal(pointerWorld.clone());
+                    poemLanterns.forEach((lan) => {
+                        lan.angle += 0.0075;
+                        const lx = Math.cos(lan.angle) * lan.radius;
+                        const lz = Math.sin(lan.angle) * lan.radius;
+                        const ly = lan.baseY + Math.sin(t * 1.7 + lan.phase) * 0.22;
+                        lan.group.position.set(lx, ly, lz);
+                        lan.flame.rotation.y = t * 2.5;
+
+                        const sc = Math.hypot(lx - localP.x, ly - localP.y) < 1.25 ? 1.45 : 1.0;
+                        lan.group.scale.lerp(new THREE.Vector3(sc, sc, sc), 0.15);
+                    });
+
+                    // Falling Golden Rose Petals
+                    poemPetals.forEach((rp) => {
+                        rp.mesh.position.y -= rp.fall;
+                        rp.mesh.position.x += Math.sin(t * rp.sway + rp.phase) * 0.01 + pointerNDC.x * 0.015;
+                        rp.mesh.rotation.x += 0.02;
+                        rp.mesh.rotation.y += 0.03;
+                        if (rp.mesh.position.y < -3.5) {
+                            rp.mesh.position.y = 4.5;
+                        }
+                    });
+                }
+
+                // Global Ambient Starfield Parallax
+                const sArr = globalStarGeo.attributes.position.array;
+                for (let i = 0; i < globalStarCount; i++) {
+                    const ix = i * 3, iy = i * 3 + 1, iz = i * 3 + 2;
+                    sArr[ix] = gBase[ix] + pointerNDC.x * 0.55;
+                    sArr[iy] = gBase[iy] + pointerNDC.y * 0.55;
+                    sArr[iz] = gBase[iz] + totalPulse * Math.sin(i * 0.3) * 0.5;
+                }
+                globalStarGeo.attributes.position.needsUpdate = true;
+                globalStarField.rotation.y = t * 0.025;
+
+                // Update 3D Shockwaves
+                for (let i = activeShockwaves.length - 1; i >= 0; i--) {
+                    const sw = activeShockwaves[i];
+                    sw.life -= 0.022;
+                    if (sw.life <= 0) {
+                        scene.remove(sw.mesh);
+                        sw.mesh.geometry.dispose();
+                        sw.mesh.material.dispose();
+                        activeShockwaves.splice(i, 1);
+                    } else {
+                        const scale = 1 + (1 - sw.life) * 9.5;
+                        sw.mesh.scale.set(scale, scale, 1);
+                        sw.mesh.material.opacity = sw.life * 0.85;
+                    }
+                }
+
+                // Cinematic Camera Flight Interpolation per Realm
+                const rCfg = REALMS[AppState.realmIdx];
+                const mobileZBoost = window.innerWidth < 768 ? 2.2 : 0;
+                camera.position.x += (rCfg.camPos[0] - camera.position.x) * 0.06;
+                camera.position.y += (rCfg.camPos[1] - camera.position.y) * 0.06;
+                camera.position.z += ((rCfg.camPos[2] + mobileZBoost) - camera.position.z) * 0.06;
+
+                camTargetVec.lerp(new THREE.Vector3(...rCfg.camTarget), 0.08);
+                camera.lookAt(camTargetVec);
+
+                renderer.render(scene, camera);
+                stardust2D.updateAndRender();
+            }
+
+            animate();
+        }
+
+        // =========================================================================
+        // 5. DYNAMIC REALM UI & MODAL CONTROLLERS
+        // =========================================================================
+        function renderRealmsNavigation() {
+            const nav = document.getElementById('realms-nav');
+            nav.innerHTML = '';
+            REALMS.forEach((realm, idx) => {
+                const isActive = AppState.realmIdx === idx;
+                const btn = document.createElement('button');
+                btn.className = `px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
+                    isActive
+                        ? 'btn-cosmic-primary shadow-md scale-105'
+                        : 'text-gray-300 hover:text-white hover:bg-white/10'
+                }`;
+                btn.innerHTML = `<span class="opacity-65 text-[10px] font-mono">${idx + 1}.</span><i class="fa-solid ${realm.icon}"></i><span>${realm.shortName}</span>`;
+                btn.onclick = () => switchToRealm(idx);
+                nav.appendChild(btn);
+            });
+        }
+
+        function renderRealmSpecificActions() {
+            const bar = document.getElementById('realm-actions-bar');
+            bar.innerHTML = '';
+            const realm = REALMS[AppState.realmIdx];
+
+            if (realm.id === 'throne') {
+                bar.innerHTML = `
+                    <button id="act-throne-wish" class="magnetic-btn btn-cosmic-primary px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl text-xs sm:text-sm flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>أمنية ملكية لوفاء ✨</span>
+                    </button>
+                `;
+                document.getElementById('act-throne-wish').onclick = () => {
+                    if (!AppState.audioEnabled) soundEngine.startAmbient();
+                    else soundEngine.playSupernovaChord();
+                    window.triggerCosmicShockwave(true);
+                    openCosmicModal(
+                        'fa-crown',
+                        'ROYAL BIRTHDAY TRIBUTE',
+                        'كل عام وأنتِ بألف خير يا وفاء منصوري!',
+                        'في يوم ميلادكِ، يحتفي بكِ هذا الكون الرقمي متمنياً لكِ عاماً جديداً يفيض بالصحة، السكينة، والتألق الدائم في كل خطوة تخطينها. 🎂✨'
+                    );
+                };
+            } else if (realm.id === 'lotus') {
+                bar.innerHTML = `
+                    <button id="act-lotus-bloom" class="magnetic-btn btn-cosmic-primary px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl text-xs sm:text-sm flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-spa"></i>
+                        <span>تفتيح كل زهور اللوتس 🌸</span>
+                    </button>
+                `;
+                document.getElementById('act-lotus-bloom').onclick = () => {
+                    window.triggerCosmicShockwave(true);
+                    soundEngine.playSupernovaChord();
+                    openCosmicModal(
+                        'fa-spa',
+                        'JARDIN DE CRISTAL',
+                        'أمنيات حديقة اللوتس لوفاء',
+                        LOTUS_WISHES[Math.floor(Math.random() * LOTUS_WISHES.length)]
+                    );
+                };
+            } else if (realm.id === 'observatory') {
+                bar.innerHTML = `
+                    <button data-shape="wafaeEn" class="star-shape-btn magnetic-btn ${AppState.starShapeMode === 'wafaeEn' ? 'btn-cosmic-primary' : 'glass-panel text-white'} px-4 py-2.5 rounded-2xl text-xs font-bold cursor-pointer">
+                        نجوم WAFAE ✨
+                    </button>
+                    <button data-shape="wafaeAr" class="star-shape-btn magnetic-btn ${AppState.starShapeMode === 'wafaeAr' ? 'btn-cosmic-primary' : 'glass-panel text-white'} px-4 py-2.5 rounded-2xl text-xs font-bold cursor-pointer">
+                        نجوم وفاء 👑
+                    </button>
+                    <button data-shape="heart" class="star-shape-btn magnetic-btn ${AppState.starShapeMode === 'heart' ? 'btn-cosmic-primary' : 'glass-panel text-white'} px-4 py-2.5 rounded-2xl text-xs font-bold cursor-pointer">
+                        كوكبة القلب 💖
+                    </button>
+                    <button id="act-launch-comet" class="magnetic-btn glass-panel px-4 py-2.5 rounded-2xl text-xs font-bold text-amber-200 hover:border-amber-300/60 flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-meteor text-amber-300"></i>
+                        <span>إطلاق شهاب</span>
+                    </button>
+                `;
+                document.querySelectorAll('.star-shape-btn').forEach((b) => {
+                    b.onclick = () => {
+                        AppState.starShapeMode = b.dataset.shape;
+                        soundEngine.playChime(880, 0.9, 0.12);
+                        renderRealmSpecificActions();
+                    };
+                });
+                document.getElementById('act-launch-comet').onclick = () => window.launchObservatoryComet();
+            } else if (realm.id === 'harp') {
+                bar.innerHTML = `
+                    <button id="act-strum-harp" class="magnetic-btn btn-cosmic-primary px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl text-xs sm:text-sm flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-music"></i>
+                        <span>عزف سيمفونية الأوتار الـ 12 🎶</span>
+                    </button>
+                `;
+                document.getElementById('act-strum-harp').onclick = () => window.strumAllHarpStrings();
+            } else if (realm.id === 'gallery') {
+                bar.innerHTML = `
+                    <button id="act-random-artifact" class="magnetic-btn btn-cosmic-primary px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl text-xs sm:text-sm flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-gem"></i>
+                        <span>فتح جوهرة ذكرى عشوائية 💎</span>
+                    </button>
+                `;
+                document.getElementById('act-random-artifact').onclick = () => {
+                    const art = MONOLITH_ARTIFACTS[Math.floor(Math.random() * MONOLITH_ARTIFACTS.length)];
+                    soundEngine.playSupernovaChord();
+                    window.triggerCosmicShockwave(false);
+                    openCosmicModal(art.icon, art.tag, art.title, art.body);
+                };
+            } else if (realm.id === 'supernova') {
+                bar.innerHTML = `
+                    <button id="act-toggle-candles" class="magnetic-btn btn-cosmic-primary px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl text-xs sm:text-sm flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid ${AppState.candlesLit ? 'fa-wind' : 'fa-fire'}"></i>
+                        <span>${AppState.candlesLit ? 'إطفاء الشموع وتفجير السوبرنوفا 🕯️' : 'إعادة إشعال الشموع ✨'}</span>
+                    </button>
+                `;
+                document.getElementById('act-toggle-candles').onclick = () => toggleCandlesState();
+            } else if (realm.id === 'justice') {
+                bar.innerHTML = `
+                    <button id="act-gavel-strike" class="magnetic-btn btn-cosmic-primary px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl text-xs sm:text-sm flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-gavel"></i>
+                        <span>دقّ مطرقة العدالة وموازنة الميزان ⚖️</span>
+                    </button>
+                    <button id="act-uca-tribute" class="magnetic-btn glass-panel px-4 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold text-amber-200 hover:border-amber-300/60 flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-building-columns text-amber-300"></i>
+                        <span>تحية جامعة القاضي عياض 🏛️</span>
+                    </button>
+                `;
+                document.getElementById('act-gavel-strike').onclick = () => window.triggerJusticeGavelStrike();
+                document.getElementById('act-uca-tribute').onclick = () => {
+                    const uca = JUSTICE_PILLARS[0];
+                    soundEngine.playSupernovaChord();
+                    window.triggerCosmicShockwave(false);
+                    openCosmicModal(uca.icon, uca.tag, uca.title, uca.body);
+                };
+            } else if (realm.id === 'poems') {
+                bar.innerHTML = `
+                    <button id="act-new-poem" class="magnetic-btn btn-cosmic-primary px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl text-xs sm:text-sm flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-feather-pointed"></i>
+                        <span>أطلقي رسالة قلبية جديدة لوفاء ✨</span>
+                    </button>
+                    <button id="act-flutter-wings" class="magnetic-btn glass-panel px-4 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold text-amber-200 hover:border-amber-300/60 flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-dove text-amber-300"></i>
+                        <span>تحريك الأجنحة الكريستالية 🕊️</span>
+                    </button>
+                `;
+                document.getElementById('act-new-poem').onclick = () => window.revealPoeticTribute();
+                document.getElementById('act-flutter-wings').onclick = () => {
+                    AppState.wingFlutterBoost = 1.25;
+                    window.triggerCosmicShockwave(false);
+                    soundEngine.playChime(987.77, 1.0, 0.13);
+                };
+            }
+        }
+
+        function toggleCandlesState() {
+            AppState.candlesLit = !AppState.candlesLit;
+            renderRealmSpecificActions();
+            if (!AppState.candlesLit) {
+                if (!AppState.audioEnabled) soundEngine.startAmbient();
+                else soundEngine.playSupernovaChord();
+                window.triggerCosmicShockwave(true);
+                openCosmicModal(
+                    'fa-cake-candles',
+                    'GRAND SUPERNOVA FINALE',
+                    'تحققت أمنيتكِ يا وفاء! 🎆🎂',
+                    'كل عام وأنتِ بألف خير وصحة وسعادة.. عسى أن يكون عامكِ الجديد مليئاً بالنجاح والتألق وتحقيق كل الأحلام!'
+                );
+            } else {
+                soundEngine.playChime(659.25, 0.8, 0.12);
+            }
+        }
+
+        function switchToRealm(idx) {
+            AppState.realmIdx = (idx + REALMS.length) % REALMS.length;
+            const realm = REALMS[AppState.realmIdx];
+
+            document.getElementById('realm-badge-icon').className = `fa-solid ${realm.icon} text-amber-300`;
+            document.getElementById('realm-badge-text').textContent = `العالم ${AppState.realmIdx + 1} من ${REALMS.length} • ${realm.shortName}`;
+            document.getElementById('realm-title').textContent = realm.title;
+            document.getElementById('realm-subtitle').textContent = realm.subtitle;
+            document.getElementById('dynamic-quote').textContent = realm.quote;
+
+            renderRealmsNavigation();
+            renderRealmSpecificActions();
+            soundEngine.playChime(523.25 + AppState.realmIdx * 80, 0.85, 0.1);
+        }
+
+        function openCosmicModal(iconClass, tag, title, body) {
+            document.getElementById('modal-icon').className = `fa-solid ${iconClass}`;
+            document.getElementById('modal-tag').textContent = tag;
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').textContent = body;
+            document.getElementById('wish-modal').classList.add('open');
+        }
+
+        function applyTheme(themeKey) {
+            const theme = THEMES[themeKey];
+            if (!theme) return;
+            AppState.themeKey = themeKey;
+
+            const root = document.documentElement;
+            root.style.setProperty('--accent-primary', theme.cssPrimary);
+            root.style.setProperty('--accent-secondary', theme.cssSecondary);
+            root.style.setProperty('--accent-glow', theme.cssGlow);
+            root.style.setProperty('--bg-deep', theme.cssBg);
+
+            document.querySelectorAll('.theme-btn').forEach((btn) => {
+                const isSelected = btn.dataset.theme === themeKey;
+                btn.className = `theme-btn w-4 h-4 sm:w-5 sm:h-5 rounded-full transition-transform cursor-pointer ${
+                    isSelected ? 'ring-2 ring-white scale-110 opacity-100' : 'opacity-60 hover:opacity-100'
+                }`;
+            });
+        }
+
+        function setupMicroInteractions() {
+            const dot = document.getElementById('cursor-dot');
+            const ring = document.getElementById('cursor-ring');
+            let ringX = window.innerWidth / 2, ringY = window.innerHeight / 2;
+            let mouseX = ringX, mouseY = ringY;
+
+            if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && dot && ring) {
+                window.addEventListener('mousemove', (e) => {
+                    mouseX = e.clientX; mouseY = e.clientY;
+                    dot.style.opacity = '1'; ring.style.opacity = '1';
+                    dot.style.left = `${mouseX}px`; dot.style.top = `${mouseY}px`;
+                }, { passive: true });
+
+                document.addEventListener('mouseleave', () => {
+                    dot.style.opacity = '0'; ring.style.opacity = '0';
+                });
+
+                document.addEventListener('mouseover', (e) => {
+                    if (e.target.closest('button, .tilt-card')) {
+                        ring.style.width = '54px'; ring.style.height = '54px';
+                    } else {
+                        ring.style.width = '40px'; ring.style.height = '40px';
+                    }
+                });
+
+                const animateCursorRing = () => {
+                    ringX += (mouseX - ringX) * 0.18;
+                    ringY += (mouseY - ringY) * 0.18;
+                    ring.style.left = `${ringX}px`;
+                    ring.style.top = `${ringY}px`;
+                    requestAnimationFrame(animateCursorRing);
+                };
+                animateCursorRing();
+            }
+
+            document.querySelectorAll('.tilt-card').forEach((card) => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    card.style.setProperty('--mx', `${x}px`);
+                    card.style.setProperty('--my', `${y}px`);
+                    const rotX = ((y / rect.height) - 0.5) * -8;
+                    const rotY = ((x / rect.width) - 0.5) * 8;
+                    card.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = '';
+                });
+            });
+        }
+
+        // =========================================================================
+        // 6. BOOTSTRAP APPLICATION
+        // =========================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            const stardust2D = new StardustOverlay2D(document.getElementById('stardust-canvas'));
+            initSixRealmUniverse(stardust2D);
+            setupMicroInteractions();
+            applyTheme('cosmicAurora');
+            switchToRealm(0);
+
+            document.querySelectorAll('.theme-btn').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    applyTheme(btn.dataset.theme);
+                    window.triggerCosmicShockwave(false);
+                    soundEngine.playChime();
+                });
+            });
+
+            document.getElementById('btn-audio').addEventListener('click', () => soundEngine.toggle());
+
+            document.getElementById('btn-orbit').addEventListener('click', () => {
+                AppState.autoOrbit = !AppState.autoOrbit;
+                if (AppState.autoOrbit) window.resetCameraView();
+                document.getElementById('orbit-icon').className = AppState.autoOrbit
+                    ? 'fa-solid fa-compass text-emerald-400'
+                    : 'fa-solid fa-hand-pointer text-amber-300';
+                soundEngine.playChime(659.25, 0.7, 0.09);
+            });
+
+            document.getElementById('btn-shockwave').addEventListener('click', () => {
+                window.triggerCosmicShockwave(false);
+                soundEngine.playChime(783.99, 1.0, 0.14);
+            });
+
+            document.getElementById('btn-prev-realm').addEventListener('click', () => switchToRealm(AppState.realmIdx - 1));
+            document.getElementById('btn-next-realm').addEventListener('click', () => switchToRealm(AppState.realmIdx + 1));
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') switchToRealm(AppState.realmIdx - 1);
+                if (e.key === 'ArrowLeft') switchToRealm(AppState.realmIdx + 1);
+            });
+
+            const wishModal = document.getElementById('wish-modal');
+            document.getElementById('btn-close-modal').addEventListener('click', () => wishModal.classList.remove('open'));
+            document.getElementById('btn-modal-close-action').addEventListener('click', () => wishModal.classList.remove('open'));
+            wishModal.addEventListener('click', (e) => { if (e.target === wishModal) wishModal.classList.remove('open'); });
+
+            document.getElementById('btn-more-fireworks').addEventListener('click', () => {
+                window.triggerCosmicShockwave(true);
+                soundEngine.playSupernovaChord();
+            });
+
+            const poetryStrip = document.getElementById('poetry-strip');
+            const stripIcon = document.getElementById('strip-icon');
+            document.getElementById('btn-toggle-strip').addEventListener('click', () => {
+                const isHidden = poetryStrip.classList.toggle('hidden');
+                stripIcon.className = isHidden ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
+            });
+        });
+    </script>
+</body>
+</html>
